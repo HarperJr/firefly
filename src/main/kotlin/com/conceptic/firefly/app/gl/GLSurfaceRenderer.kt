@@ -35,7 +35,7 @@ class GLSurfaceRenderer(
     }
 
     override fun onScreenSizeChanged(width: Int, height: Int) {
-
+        glViewport(0, height, width, 0)
     }
 
     override fun onScreenUpdate() {
@@ -49,6 +49,9 @@ class GLSurfaceRenderer(
 
     private fun initGL() {
         GL.createCapabilities()
+        glEnable(GL_DEPTH_TEST)
+        glDepthFunc(GL_ALWAYS)
+
         glClearColor(1f, 0f, 0f, 0f)
     }
 }
