@@ -8,19 +8,22 @@ import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.system.MemoryUtil.NULL
 
 typealias Dimensions = Pair<Int, Int>
-
 typealias KeyActionCallback = (Keys, KeyAction) -> Unit
+typealias ScreenActionCallback = (ScreenAction) -> Unit
 
 class GLFWScreen private constructor(
     private val title: String,
     private val fullScreen: Boolean,
-    private var dimensions: Dimensions
+    private var dimensions: Dimensions,
+    private var keyActionCallback: KeyActionCallback?,
+    private var screenActionCallback: ScreenActionCallback?
 ) {
     private val logger = Logger.getLogger<GLFWScreen>()
-    private val onKeyActionCallbacks = mutableListOf<KeyActionCallback>()
     private var window: Long = NULL
 
     init {
+        screenActionCallback?.invoke(InitAction)
+
         GLFWErrorCallback.createPrint(System.err)
         if (!glfwInit()) throw IllegalStateException("Unable to init GLFW")
 
@@ -35,13 +38,15 @@ class GLFWScreen private constructor(
 
         //On screen key callback declared here to handle key usability
         glfwSetKeyCallback(window) { _, glfwKeyCode, _, glfwActionCode, _ ->
-            onKeyActionCallbacks.forEach {
-                it.invoke(Keys.fromGlfw(glfwKeyCode), KeyAction.fromGlfw(glfwActionCode))
-            }
+            keyActionCallback?.invoke(Keys.fromGlfw(glfwKeyCode), KeyAction.fromGlfw(glfwActionCode))
         }
 
-        glfwSetWindowSizeCallback(window) { _, width, height ->
-            dimensions = dimensions.copy(width, height)
+        glfwSetWindowSizeCallback(window) { _, newWidth, newHeight ->
+            val (width, height) = dimensions
+            if (width != newWidth || height != newHeight) {
+                screenActionCallback?.invoke(SizeChangeAction(width, height))
+                dimensions = dimensions.copy(width, height)
+            }
         }
 
         runCatching {
@@ -59,26 +64,24 @@ class GLFWScreen private constructor(
                     glfwSetWindowSize(window, vidMode.width(), vidMode.height())
             }
         }.onFailure {
-            logger.d(it.message)
+            logger.debug(it.message)
         }
+
+        glfwMakeContextCurrent(window)
+        glfwSwapInterval(1)
     }
 
     fun showWindow() {
         checkWindowNotNull()
-        glfwMakeContextCurrent(window)
-        glfwSwapInterval(1)
-        glfwShowWindow(window)
-    }
+        screenActionCallback?.invoke(ShowAction)
 
-    fun notifyDimensionChanged(screenWidth: Int, screenHeight: Int) {
-        checkWindowNotNull()
-        val (width, height) = dimensions
-        if (width != screenWidth || height != screenHeight)
-            glfwSetWindowSize(window, width, height)
+        glfwShowWindow(window)
     }
 
     fun destroy() {
         checkWindowNotNull()
+        screenActionCallback?.invoke(DestroyAction)
+
         glfwFreeCallbacks(window)
         glfwDestroyWindow(window)
 
@@ -87,10 +90,6 @@ class GLFWScreen private constructor(
 
         window = NULL
     }
-
-    fun addKeyActionCallback(callback: (Keys, KeyAction) -> Unit) = onKeyActionCallbacks.add(callback)
-
-    fun removeKeyActionCallback(callback: (Keys, KeyAction) -> Unit) = onKeyActionCallbacks.remove(callback)
 
     private fun checkWindowNotNull() {
         if (window == NULL) throw IllegalStateException("Window is null")
@@ -103,6 +102,8 @@ class GLFWScreen private constructor(
 
     fun update() {
         checkWindowNotNull()
+        screenActionCallback?.invoke(UpdateAction)
+
         glfwSwapBuffers(window)
         glfwPollEvents()
     }
@@ -111,6 +112,8 @@ class GLFWScreen private constructor(
         private var title = DEFAULT_TITLE
         private var fullScreen = false
         private var dimensions = Dimensions(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT)
+        private var keyActionCallback: KeyActionCallback? = null
+        private var screenActionCallback: ScreenActionCallback? = null
 
         fun setTitle(title: String) = this.apply { this@Builder.title = title }
 
@@ -121,7 +124,13 @@ class GLFWScreen private constructor(
                 this@Builder.dimensions = Dimensions(width, height)
         }
 
-        fun build() = GLFWScreen(title, fullScreen, dimensions)
+        fun setKeyActionCallback(callback: KeyActionCallback) =
+            this.apply { this@Builder.keyActionCallback = callback }
+
+        fun setScreenActionCallback(callback: ScreenActionCallback) =
+            this.apply { this@Builder.screenActionCallback = callback }
+
+        fun build() = GLFWScreen(title, fullScreen, dimensions, keyActionCallback, screenActionCallback)
 
         companion object {
             private const val DEFAULT_TITLE = "Screen"

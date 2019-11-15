@@ -1,20 +1,24 @@
 package com.conceptic.firefly.log
 
-import java.util.logging.Level
+import org.apache.logging.log4j.LogManager
 
 interface Logger {
-    fun d(message: String?)
+    fun debug(message: String?, vararg params: Any)
 
-    fun i(message: String?)
+    fun info(message: String?, vararg params: Any)
 
-    fun e(throwable: Throwable)
+    fun error(throwable: Throwable, vararg params: Any)
+
+    fun fatal(throwable: Throwable, vararg params: Any)
 
     companion object {
-        val DEFAULT_LOGGER = JUtilsLogger
+        val DEFAULT_LOGGER = Log4JLogger
         inline fun <reified T> getLogger(tree: LoggerTree = LoggerTree.DEFAULT): Logger {
             val defaultTag = T::class.simpleName!!
             return when (tree) {
-                LoggerTree.DEFAULT -> DEFAULT_LOGGER.provide(defaultTag)
+                LoggerTree.DEFAULT -> {
+                    DEFAULT_LOGGER.provide(defaultTag)
+                }
             }
         }
     }
@@ -28,16 +32,17 @@ enum class LoggerTree {
     DEFAULT
 }
 
-object JUtilsLogger : LoggerProvider {
+object Log4JLogger : LoggerProvider {
     override fun provide(tag: String): Logger {
+        val logger = LogManager.getLogger(tag)
         return object : Logger {
-            private val logger = java.util.logging.Logger.getLogger(tag)
+            override fun debug(message: String?, vararg params: Any) = logger.debug(message, params)
 
-            override fun d(message: String?) = logger.log(Level.ALL, message)
+            override fun info(message: String?, vararg params: Any) = logger.info(message, params)
 
-            override fun i(message: String?) = logger.log(Level.INFO, message)
+            override fun error(throwable: Throwable, vararg params: Any) = logger.error(throwable.message, params)
 
-            override fun e(throwable: Throwable) = logger.log(Level.FINE, throwable.message)
+            override fun fatal(throwable: Throwable, vararg params: Any) = logger.fatal(throwable.message, params)
         }
     }
 }

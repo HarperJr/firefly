@@ -1,22 +1,25 @@
 package com.conceptic.firefly.app
 
+import com.conceptic.firefly.app.gl.GLSurfaceRenderer
 import com.conceptic.firefly.di.applicationModule
 import com.conceptic.firefly.log.Logger
 import com.conceptic.firefly.screen.ScreenController
 import org.koin.core.KoinComponent
 import org.koin.core.context.startKoin
 import org.koin.core.qualifier.named
+import java.util.concurrent.Executors
 
 /**
  * Main class for application instance
  */
-class Application : KoinComponent {
+class Application(
+    private val screenController: ScreenController,
+    private val glSurfaceRenderer: GLSurfaceRenderer
+) : KoinComponent {
     private val logger = Logger.getLogger<Application>()
+    private val fixedUpdatesExecutor = Executors.newSingleThreadExecutor()
 
-    private val scope = getKoin().getOrCreateScope(APP_SCOPE, named<Application>())
-    private val screenController by scope.inject<ScreenController>()
-
-    private var running = false
+    private var needsUpdates = false
 
     fun run() {
         init()
@@ -24,18 +27,29 @@ class Application : KoinComponent {
     }
 
     private fun runLoop() {
-        running = true
-
+        needsUpdates = true
         runCatching {
             screenController.show()
-            while (screenController.isActive() && running) {
-
+            runFixedUpdates()
+            while (needsUpdates) {
                 screenController.update()
+                needsUpdates = screenController.isActive()
             }
         }.onSuccess {
+            fixedUpdatesExecutor.shutdown()
             screenController.destroy()
-            getKoin().deleteScope(APP_SCOPE)
-        }.onFailure { logger.e(it) }
+        }.onFailure { logger.error(it) }
+    }
+
+    private fun runFixedUpdates() {
+        fixedUpdatesExecutor.submit {
+            kotlin.runCatching {
+                while (needsUpdates) {
+                    glSurfaceRenderer.updateAsync()
+                    Thread.sleep(FIXED_UPDATES_COOLDOWN)
+                }
+            }
+        }
     }
 
     private fun init() {
@@ -44,11 +58,16 @@ class Application : KoinComponent {
 
     companion object {
         private const val APP_SCOPE = "application_scope"
+        private const val FIXED_UPDATES_COOLDOWN = 1000L
 
         fun runApplication() = startKoin { modules(applicationModule) }
             .also {
-                val application = it.koin.get<Application>()
+                val appScope = it.koin.createScope(APP_SCOPE, named<Application>())
+
+                val application = appScope.get<Application>()
                 application.run()
+
+                it.koin.deleteScope(APP_SCOPE)
             }
     }
 }
