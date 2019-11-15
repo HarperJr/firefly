@@ -27,10 +27,9 @@ class ScreenController {
 
     fun show() = screen?.showWindow() ?: throw IllegalStateException("Window is not initiated")
 
+    fun update() = screen?.update()
 
-    fun isActive() = screen?.isActive()
-
-    fun swapBuffers() = screen?.update()
+    fun isActive() = screen?.isActive() ?: false
 
     fun destroy() {
         screen?.destroy() ?: throw IllegalStateException("Window is already destroyed")

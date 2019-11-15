@@ -11,14 +11,21 @@ interface Logger {
 
     companion object {
         val DEFAULT_LOGGER = JUtilsLogger
-        inline fun <reified T> getLogger(): Logger {
-            return DEFAULT_LOGGER.provide(T::class.simpleName!!)
+        inline fun <reified T> getLogger(tree: LoggerTree = LoggerTree.DEFAULT): Logger {
+            val defaultTag = T::class.simpleName!!
+            return when (tree) {
+                LoggerTree.DEFAULT -> DEFAULT_LOGGER.provide(defaultTag)
+            }
         }
     }
 }
 
 interface LoggerProvider {
     fun provide(tag: String): Logger
+}
+
+enum class LoggerTree {
+    DEFAULT
 }
 
 object JUtilsLogger : LoggerProvider {

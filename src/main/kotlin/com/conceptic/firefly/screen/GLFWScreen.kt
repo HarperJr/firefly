@@ -98,7 +98,7 @@ class GLFWScreen private constructor(
 
     fun isActive(): Boolean {
         checkWindowNotNull()
-        return glfwWindowShouldClose(window)
+        return !glfwWindowShouldClose(window)
     }
 
     fun update() {
