@@ -2,7 +2,7 @@ package com.conceptic.firefly.di
 
 import com.conceptic.firefly.app.Application
 import com.conceptic.firefly.app.camera.CameraController
-import com.conceptic.firefly.app.gl.GLSurfaceRenderer
+import com.conceptic.firefly.app.gl.GLSurfaceController
 import com.conceptic.firefly.screen.ScreenController
 import com.conceptic.firefly.screen.support.KeyActionsPublisher
 import com.conceptic.firefly.screen.support.MouseActionsPublisher
@@ -28,8 +28,8 @@ val applicationModule = module {
         /**
          * Renderers
          */
-        factory { GLSurfaceRenderer(get()) }
+        factory { GLSurfaceController(get()) }
 
-        scoped { Application(get(), get()) }
+        scoped { Application(get(), get(), get()) }
     }
 }

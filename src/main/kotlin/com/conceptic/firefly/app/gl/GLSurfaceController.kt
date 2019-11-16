@@ -6,10 +6,10 @@ import com.conceptic.firefly.screen.support.ScreenUpdatesSubscriber
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.*
 
-class GLSurfaceRenderer(
+class GLSurfaceController(
     private val screenUpdatesPublisher: ScreenUpdatesPublisher
 ) : ScreenUpdatesSubscriber {
-    private val logger = Logger.getLogger<GLSurfaceRenderer>()
+    private val logger = Logger.getLogger<GLSurfaceController>()
 
     init {
         screenUpdatesPublisher.subscribe(this)
