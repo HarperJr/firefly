@@ -3,6 +3,9 @@ package com.conceptic.firefly.di
 import com.conceptic.firefly.app.Application
 import com.conceptic.firefly.app.camera.CameraController
 import com.conceptic.firefly.app.gl.GLSurfaceController
+import com.conceptic.firefly.app.gl.renderer.SceneRenderer
+import com.conceptic.firefly.app.gl.shader.ShaderStore
+import com.conceptic.firefly.app.scene.Scene
 import com.conceptic.firefly.screen.ScreenController
 import com.conceptic.firefly.screen.support.KeyActionsPublisher
 import com.conceptic.firefly.screen.support.MouseActionsPublisher
@@ -11,6 +14,8 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val applicationModule = module {
+    single { ShaderStore() }
+
     scope(named<Application>()) {
         /**
          * Publishers
@@ -29,7 +34,16 @@ val applicationModule = module {
          * Renderers
          */
         factory { GLSurfaceController(get()) }
+        factory { SceneRenderer(get()) }
 
-        scoped { Application(get(), get(), get()) }
+        /**
+         * Scene
+         */
+        scope(named<Scene>()) {
+
+        }
+
+        scoped { Scene(get(), get()) }
+        scoped { Application(get(), get(), get(), get()) }
     }
 }

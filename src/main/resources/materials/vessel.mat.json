@@ -1,0 +1,13 @@
+{
+  "name": "vessel",
+  "shader": "solid.shd",
+  "dissolve_factor": 1.0,
+  "specular_factor": 1.0,
+  "ambient": [1.0, 1.0, 1.0],
+  "diffuse": [1.0, 1.0, 1.0],
+  "specular": [1.0, 1.0, 1.0],
+  "emissive": [1.0, 1.0, 1.0],
+  "map_ambient": "vessel/vessel.amb.png",
+  "map_diffuse": "vessel/vessel.dif.png",
+  "map_specular": "vessel/vessel/spc.png"
+}

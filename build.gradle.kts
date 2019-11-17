@@ -22,6 +22,7 @@ dependencies {
     compile("org.apache.logging.log4j", "log4j-core", log4jVersion)
 
     implementation("org.koin", "koin-core", koinVersion)
+    implementation("com.google.code.gson", "gson", "2.8.6")
 }
 
 tasks.withType<KotlinCompile> {
