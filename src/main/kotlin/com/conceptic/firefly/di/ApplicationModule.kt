@@ -3,7 +3,6 @@ package com.conceptic.firefly.di
 import com.conceptic.firefly.app.Application
 import com.conceptic.firefly.app.camera.CameraController
 import com.conceptic.firefly.app.gl.GLSurfaceController
-import com.conceptic.firefly.app.gl.renderer.SceneRenderer
 import com.conceptic.firefly.app.gl.shader.ShaderStore
 import com.conceptic.firefly.app.scene.Scene
 import com.conceptic.firefly.screen.ScreenController
@@ -34,7 +33,6 @@ val applicationModule = module {
          * Renderers
          */
         factory { GLSurfaceController(get()) }
-        factory { SceneRenderer(get()) }
 
         /**
          * Scene

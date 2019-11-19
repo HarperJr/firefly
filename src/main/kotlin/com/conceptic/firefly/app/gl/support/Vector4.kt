@@ -1,16 +1,17 @@
 package com.conceptic.firefly.app.gl.support
 
-import org.joml.Vector3f
+import org.joml.Vector4f
 
-class Vector3(xCoord: Float, yCoord: Float, zCoord: Float) {
+class Vector4(xCoord: Float, yCoord: Float, zCoord: Float, wCoord: Float) {
     val x get() = components.x
     val y get() = components.y
     val z get() = components.z
+    val w get() = components.w
     val normalized get() = components.normalize()
 
-    private var components = Vector3f(xCoord, yCoord, zCoord)
+    private var components = Vector4f(xCoord, yCoord, zCoord, wCoord)
 
-    fun distance(vector: Vector3) = components.distance(vector.x, vector.y, vector.z)
+    fun distance(vector: Vector4) = components.distance(vector.x, vector.y, vector.z, vector.w)
 
     fun rotateX(angle: Float) = components.rotateX(angle)
 
@@ -18,11 +19,11 @@ class Vector3(xCoord: Float, yCoord: Float, zCoord: Float) {
 
     fun rotateZ(angle: Float) = components.rotateZ(angle)
 
-    fun cross(vector: Vector3) = components.cross(vector.x, vector.y, vector.z)
+    fun toVector3() = Vector3(x, y, z)
 
     override fun equals(other: Any?): Boolean {
         return other?.let {
-            if (other is Vector3) {
+            if (other is Vector4) {
                 components == other.components
             } else false
         } ?: false
@@ -37,7 +38,7 @@ class Vector3(xCoord: Float, yCoord: Float, zCoord: Float) {
     }
 
     companion object {
-        val ZERO = Vector3(0f, 0f, 0f)
-        val IDENTITY = Vector3(1f, 1f, 1f)
+        val ZERO = Vector4(0f, 0f, 0f, 0f)
+        val IDENTITY = Vector4(1f, 1f, 1f, 1f)
     }
 }

@@ -1,7 +1,8 @@
 package com.conceptic.firefly.app.gl.shader
 
-data class Shader(val type: ShaderType, val name: String, val programIdentifier: Int)
+import com.conceptic.firefly.utils.Sha1
 
-enum class ShaderType {
-    VERTEX, FRAGMENT, OBJECT
+data class Shader(val name: String, val program: Int, val uniforms: Map<String, Int>) {
+    val uniqueIndex
+        get() = Sha1.encode(name)
 }

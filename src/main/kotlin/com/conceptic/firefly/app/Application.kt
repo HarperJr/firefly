@@ -58,7 +58,6 @@ class Application(
 
     private fun init() {
         screenController.init()
-        shaderStore.init()
         scene.init()
     }
 
