@@ -17,15 +17,15 @@ object GsonAdapters {
 
         override fun read(`in`: JsonReader): Vector3? {
             return with(`in`) {
-                val components = mutableListOf<Double>()
+                val components = mutableListOf<Float>()
                 val jsonToken = peek()
                 if (jsonToken == JsonToken.BEGIN_ARRAY) {
                     beginArray()
                     while (peek() != JsonToken.END_ARRAY)
-                        components.add(nextDouble())
+                        components.add(nextDouble().toFloat())
                     endArray()
                 }
-                Vector3(components.getOrNull(0) ?: 0.0, components.getOrNull(1) ?: 0.0, components.getOrNull(2) ?: 0.0)
+                Vector3(components.getOrNull(0) ?: 0f, components.getOrNull(1) ?: 0f, components.getOrNull(2) ?: 0f)
             }
         }
     }

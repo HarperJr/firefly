@@ -1,16 +1,11 @@
 package com.conceptic.firefly.app.scene
 
-import com.conceptic.firefly.app.camera.CameraController
-import com.conceptic.firefly.app.gl.mesh.Mesh
+abstract class Scene {
+    abstract fun onCreate()
 
-class Scene(
-    private val cameraController: CameraController
-) {
-    private val meshes = mutableListOf<Mesh>()
+    abstract fun onDestroy()
 
-    /**
-     * Load objects, textures, and other resources for this scene
-     */
-    fun init() {
-    }
+    open fun onFixedUpdate() {}
+
+    open fun onUpdate() {}
 }

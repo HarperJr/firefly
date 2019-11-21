@@ -20,7 +20,11 @@ class GLSurfaceController(
      * Used for physics updates
      */
     fun updateAsync() {
-        logger.debug("updateAsync")
+
+    }
+
+    override fun onScreenUpdate() {
+        glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
     }
 
     /**
@@ -38,20 +42,12 @@ class GLSurfaceController(
         glViewport(0, height, width, 0)
     }
 
-    override fun onScreenUpdate() {
-        glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
-        logger.debug("updateSync")
-    }
-
     override fun onScreenDestroy() {
 
     }
 
     private fun initGL() {
         GL.createCapabilities()
-        glEnable(GL_DEPTH_TEST)
-        glDepthFunc(GL_ALWAYS)
-
         glClearColor(1f, 0f, 0f, 0f)
     }
 }

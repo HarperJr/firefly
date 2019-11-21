@@ -1,4 +1,11 @@
 package com.conceptic.firefly.app.scene.obj
 
-class SceneObject {
+abstract class SceneObject {
+    abstract fun onCreate()
+
+    abstract fun onDestroy()
+
+    open fun onUpdate() {}
+
+    open fun onFixedUpdate() {}
 }

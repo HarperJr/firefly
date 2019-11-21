@@ -16,9 +16,7 @@ import java.util.concurrent.Executors
  */
 class Application(
     private val screenController: ScreenController,
-    private val glSurfaceController: GLSurfaceController,
-    private val shaderStore: ShaderStore,
-    private val scene: Scene
+    private val glSurfaceController: GLSurfaceController
 ) : KoinComponent {
     private val logger = Logger.getLogger<Application>()
     private val fixedUpdatesExecutor = Executors.newSingleThreadExecutor()
@@ -58,7 +56,6 @@ class Application(
 
     private fun init() {
         screenController.init()
-        scene.init()
     }
 
     companion object {

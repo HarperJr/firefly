@@ -28,20 +28,8 @@ val applicationModule = module {
          */
         factory { ScreenController(get(), get()) }
         factory { CameraController(get()) }
-
-        /**
-         * Renderers
-         */
         factory { GLSurfaceController(get()) }
 
-        /**
-         * Scene
-         */
-        scope(named<Scene>()) {
-
-        }
-
-        scoped { Scene(get(), get()) }
-        scoped { Application(get(), get(), get(), get()) }
+        scoped { Application(get(), get()) }
     }
 }

@@ -1,19 +1,13 @@
 package com.conceptic.firefly.app.gl.shader
 
-import org.lwjgl.opengl.GL30
+import com.conceptic.firefly.app.gl.store.Store
+import org.lwjgl.opengl.GL20
 
-class ShaderStore {
-    private val shaders = mutableMapOf<String, Shader>()
+class ShaderStore : Store<String, Int>() {
+    override fun create(key: String): Int = GL20.glCreateProgram()
 
-    fun getShader(index: String) {
-
-    }
-
-    fun put(shader: Shader) {
-        shaders[shader.uniqueIndex] = shader
-    }
-
-    fun clear() {
-        shaders.forEach { _, shader -> GL30.glDeleteProgram(shader.program) }
+    override fun clear(key: String, element: Int): Boolean {
+        GL20.glDeleteProgram(element)
+        return true
     }
 }
