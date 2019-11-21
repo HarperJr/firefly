@@ -1,5 +1,10 @@
 package com.conceptic.firefly.app.gl.vbo
 
-class Vbo {
+data class Vbo(
+    val glPointer: Int,
+    val type: VboType
+)
 
+enum class VboType {
+    VERTEX, COLOR, INDEX
 }
