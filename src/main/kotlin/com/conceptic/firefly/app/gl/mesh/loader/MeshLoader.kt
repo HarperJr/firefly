@@ -1,23 +1,26 @@
 package com.conceptic.firefly.app.gl.mesh.loader
 
-import com.conceptic.firefly.app.gl.mesh.CompositeMesh
 import com.conceptic.firefly.app.gl.mesh.Mesh
 import com.conceptic.firefly.app.gl.mesh.MeshStore
 import com.conceptic.firefly.app.gl.mesh.SolidMesh
 import com.conceptic.firefly.app.gl.mesh.material.Material
 import com.conceptic.firefly.app.gl.support.Vector3
 import com.conceptic.firefly.app.gl.support.Vector4
-import com.conceptic.firefly.app.gl.texture.TextureStore
+import com.conceptic.firefly.app.gl.texture.TextureLoader
 import com.conceptic.firefly.utils.FileProvider
 import org.lwjgl.assimp.*
 import java.nio.ByteBuffer
 import java.nio.IntBuffer
+import java.nio.file.Paths
 
 
 class MeshContentProvider private constructor(private val fileProvider: FileProvider) {
-    fun provide(meshFileName: String): ByteArray = fileProvider.provideFileContent(meshFileName)
+    fun provide(meshFileName: String): ByteArray =
+        fileProvider.provideFileContent(Paths.get(MESH_DIR, meshFileName).toString())
 
     companion object {
+        private const val MESH_DIR = "meshes/"
+
         fun fromFileProvider(fileProvider: FileProvider) = MeshContentProvider(fileProvider)
     }
 }
@@ -26,10 +29,11 @@ class MeshContentProvider private constructor(private val fileProvider: FileProv
  * This is possibly would lead to a very long time routine process, should be executed at separated thread
  */
 class MeshLoader(
+    private val contentProvider: MeshContentProvider,
     private val meshStore: MeshStore,
-    private val texturesStore: TextureStore
+    private val textureLoader: TextureLoader
 ) {
-    fun load(contentProvider: MeshContentProvider, meshFileName: String, join: Boolean = false): Mesh {
+    fun load(meshFileName: String): List<Mesh> {
         val meshContent = contentProvider.provide(meshFileName)
         val importScene = Assimp.aiImportFile(
             ByteBuffer.wrap(meshContent),
@@ -38,30 +42,8 @@ class MeshLoader(
 
         return importScene?.let { scene ->
             val materials = loadRawMaterials(scene)
-            val subMeshes = loadRawSubMeshes(scene, materials)
-
-            if (join) joinSubMeshes(subMeshes)
-            else CompositeMesh(meshFileName, subMeshes)
+            loadRawSubMeshes(scene, materials)
         } ?: throw IllegalArgumentException("Unable to load mesh: $meshFileName")
-    }
-
-    private fun joinSubMeshes(subMeshes: List<SolidMesh>): Mesh {
-        if (subMeshes.isEmpty()) throw IllegalStateException("No meshes were loaded")
-
-        val mainMesh = subMeshes.first()
-        val vertices = mutableListOf<Vector3>()
-        val indexes = mutableListOf<Int>()
-        val texCoordinates = mutableListOf<Vector3>()
-        val normals = mutableListOf<Vector3>()
-
-        subMeshes.forEach {
-            vertices.addAll(it.vertices)
-            indexes.addAll(it.indexes)
-            texCoordinates.addAll(it.texCoordinates)
-            normals.addAll(it.normals)
-        }
-
-        return SolidMesh(mainMesh.name, vertices, indexes, texCoordinates, normals, mainMesh.material)
     }
 
     private fun loadRawSubMeshes(scene: AIScene, materials: List<Material>): List<SolidMesh> {
@@ -106,13 +88,21 @@ class MeshLoader(
                 val diffuse = getColor(rawMaterial, Assimp.AI_MATKEY_COLOR_DIFFUSE)
                 val specular = getColor(rawMaterial, Assimp.AI_MATKEY_COLOR_SPECULAR)
                 val emissive = getColor(rawMaterial, Assimp.AI_MATKEY_COLOR_EMISSIVE)
-                val ambientMap = getTexture(rawMaterial, Assimp.aiTextureType_AMBIENT)
-                val diffuseMap = getTexture(rawMaterial, Assimp.aiTextureType_DIFFUSE)
-                val specularMap = getTexture(rawMaterial, Assimp.aiTextureType_SPECULAR)
+                val texAmbient = getTexture(rawMaterial, Assimp.aiTextureType_AMBIENT)
+                val texDiffuse = getTexture(rawMaterial, Assimp.aiTextureType_DIFFUSE)
+                val texSpecular = getTexture(rawMaterial, Assimp.aiTextureType_SPECULAR)
 
                 Material(
-                    name, ambient.w, specular.w, ambient.toVector3(), diffuse.toVector3(),
-                    emissive.toVector3(), specular.toVector3(), ambientMap, diffuseMap, specularMap
+                    name = name,
+                    dissolveFactor = ambient.w,
+                    specularFactor = specular.w,
+                    ambient = ambient.toVector3(),
+                    diffuse = diffuse.toVector3(),
+                    emissive = emissive.toVector3(),
+                    specular = specular.toVector3(),
+                    texAmbient = textureLoader.load(texAmbient),
+                    texDiffuse = textureLoader.load(texDiffuse),
+                    texSpecular = textureLoader.load(texSpecular)
                 )
             }
         } else emptyList()

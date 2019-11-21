@@ -1,6 +1,7 @@
 package com.conceptic.firefly.app.gl.mesh.material
 
 import com.conceptic.firefly.app.gl.support.Vector3
+import com.conceptic.firefly.app.gl.texture.Texture
 
 /**
  * This class represents materials instances
@@ -13,7 +14,7 @@ data class Material(
     val diffuse: Vector3,
     val specular: Vector3,
     val emissive: Vector3,
-    val texAmbient: String,
-    val texDiffuse: String,
-    val texSpecular: String
+    val texAmbient: Texture,
+    val texDiffuse: Texture,
+    val texSpecular: Texture
 )
