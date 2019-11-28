@@ -5,6 +5,8 @@ abstract class SceneObject {
 
     abstract fun onDestroy()
 
+    abstract fun retainSelfInstance(): Boolean
+
     open fun onUpdate() {}
 
     open fun onFixedUpdate() {}

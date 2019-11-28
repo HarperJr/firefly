@@ -1,8 +1,6 @@
 package com.conceptic.firefly.app.gl.mesh.loader
 
 import com.conceptic.firefly.app.gl.mesh.Mesh
-import com.conceptic.firefly.app.gl.mesh.MeshStore
-import com.conceptic.firefly.app.gl.mesh.SolidMesh
 import com.conceptic.firefly.app.gl.mesh.material.Material
 import com.conceptic.firefly.app.gl.support.Vector3
 import com.conceptic.firefly.app.gl.support.Vector4
@@ -30,7 +28,6 @@ class MeshContentProvider private constructor(private val fileProvider: FileProv
  */
 class MeshLoader(
     private val contentProvider: MeshContentProvider,
-    private val meshStore: MeshStore,
     private val textureLoader: TextureLoader
 ) {
     fun load(meshFileName: String): List<Mesh> {
@@ -46,7 +43,7 @@ class MeshLoader(
         } ?: throw IllegalArgumentException("Unable to load mesh: $meshFileName")
     }
 
-    private fun loadRawSubMeshes(scene: AIScene, materials: List<Material>): List<SolidMesh> {
+    private fun loadRawSubMeshes(scene: AIScene, materials: List<Material>): List<Mesh> {
         val numMeshes = scene.mNumMeshes()
         val meshesPointerBuffer = scene.mMeshes()
         return if (meshesPointerBuffer != null) {
@@ -59,16 +56,24 @@ class MeshLoader(
                     ?.map { texCoord -> Vector3(texCoord.x(), texCoord.y(), texCoord.z()) } ?: emptyList()
                 val normals = rawMesh.mNormals()
                     ?.map { normal -> Vector3(normal.x(), normal.y(), normal.z()) } ?: emptyList()
-                val indexes = with(mutableListOf<Int>()) {
+
+                val elements = with(mutableListOf<Int>()) {
                     rawMesh.mFaces().map { face ->
                         val indexes = face.mIndices()
                         Array(size = indexes.remaining()) { indexes.get(index) }
                     }.forEach { this@with.addAll(it) }
                     this
                 }
+
                 val materialIndex = rawMesh.mMaterialIndex()
 
-                SolidMesh(name, vertices, indexes, texCoordinates, normals, materials[materialIndex])
+                Mesh.Builder(name)
+                    .setVertices(vertices)
+                    .setTexCoordinates(texCoordinates)
+                    .setNormals(normals)
+                    .setElements(elements)
+                    .setMaterial(materials[materialIndex])
+                    .build()
             }
         } else emptyList()
     }

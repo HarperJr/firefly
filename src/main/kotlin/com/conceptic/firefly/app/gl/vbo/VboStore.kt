@@ -3,11 +3,11 @@ package com.conceptic.firefly.app.gl.vbo
 import com.conceptic.firefly.app.gl.store.Store
 import org.lwjgl.opengl.GL20
 
-class VboStore : Store<VboDefinition, Vbo>() {
-    override fun create(key: VboDefinition): Vbo = Vbo(GL20.glGenBuffers(), key.type)
+class VboStore : Store<Vbo, Int>() {
+    override fun create(key: Vbo): Int = GL20.glGenBuffers()
 
-    override fun clear(key: VboDefinition, element: Vbo): Boolean {
-        GL20.glDeleteBuffers(element.glPointer)
+    override fun clear(key: Vbo, element: Int): Boolean {
+        GL20.glDeleteBuffers(element)
         return true
     }
 }

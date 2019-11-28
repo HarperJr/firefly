@@ -1,11 +1,19 @@
 package com.conceptic.firefly.app.scene
 
-abstract class Scene {
+import com.conceptic.firefly.app.gl.renderer.Renderable
+
+abstract class Scene: Renderable {
     abstract fun onCreate()
 
     abstract fun onDestroy()
 
-    open fun onFixedUpdate() {}
+    abstract fun retainSelfInstance(): Boolean
 
-    open fun onUpdate() {}
+    open fun onFixedUpdate() {
+
+    }
+
+    open fun onUpdate() {
+
+    }
 }

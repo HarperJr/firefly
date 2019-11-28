@@ -18,28 +18,18 @@ class ShaderContentProvider private constructor(private val fileProvider: FilePr
 
 class ShaderLoader(private val shaderStore: ShaderStore) {
     fun load(shaderContentProvider: ShaderContentProvider, shaderDefinition: ShaderDefinition): Shader {
-        val shader = shaderStore.get(shaderDefinition.name)
+        val shader = shaderStore.get(shaderDefinition)
         return kotlin.runCatching {
             val shaderScripts = shaderDefinition.scripts.map { shaderScript ->
                 val shaderScriptContent = shaderContentProvider.provide(shaderScript.name)
                 createShader(shaderScript.glShaderType, String(shaderScriptContent))
-                    .also { GL20.glAttachShader(shader, it) }
+                    .also { shader.attach(it) }
             }
 
             shaderScripts.forEach { GL20.glDeleteShader(it) }
-            return@runCatching Shader(shaderDefinition.name, shader)
-        }.onSuccess { linkProgram(shader) }
+            return@runCatching shader
+        }.onSuccess { shader.link() }
             .getOrThrow()
-    }
-
-    private fun linkProgram(shaderProgram: Int) {
-        GL20.glLinkProgram(shaderProgram)
-
-        if (GL20.glGetProgrami(shaderProgram, GL20.GL_LINK_STATUS) == GL11.GL_FALSE) {
-            val info = GL20.glGetProgramInfoLog(shaderProgram, Int.MAX_VALUE)
-            GL20.glDeleteProgram(shaderProgram)
-            throw RuntimeException("Unable to link program $info")
-        }
     }
 
     private fun createShader(type: Int, content: String): Int {
@@ -54,9 +44,5 @@ class ShaderLoader(private val shaderStore: ShaderStore) {
         }
 
         return shader
-    }
-
-    companion object {
-        private const val UNIFORM_NAME_BUFFER_CAP = 512
     }
 }

@@ -16,8 +16,12 @@ layout(location = 2) in vec3 normal;
 
 out FragParams frag;
 
+vec4 worldPosition(in vec3 position) {
+    return modelViewMatrix * vec4(position, 1.0);
+}
+
 void main() {
-    vec4 worldPosition = modelViewMatrix * vec4(position, 1.0);
+    vec4 worldPosition = worldPosition(position);
 
     frag.texCoords = texCoords;
     frag.normal = normal;

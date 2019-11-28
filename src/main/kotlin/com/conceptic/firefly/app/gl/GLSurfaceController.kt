@@ -1,5 +1,7 @@
 package com.conceptic.firefly.app.gl
 
+import com.conceptic.firefly.app.scene.SceneDispatcher
+import com.conceptic.firefly.app.scene.controller.SceneController
 import com.conceptic.firefly.log.Logger
 import com.conceptic.firefly.screen.support.ScreenUpdatesPublisher
 import com.conceptic.firefly.screen.support.ScreenUpdatesSubscriber
@@ -7,7 +9,9 @@ import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.*
 
 class GLSurfaceController(
-    private val screenUpdatesPublisher: ScreenUpdatesPublisher
+    private val screenUpdatesPublisher: ScreenUpdatesPublisher,
+    private val sceneController: SceneController,
+    private val sceneDispatcher: SceneDispatcher
 ) : ScreenUpdatesSubscriber {
     private val logger = Logger.getLogger<GLSurfaceController>()
 
@@ -20,18 +24,16 @@ class GLSurfaceController(
      * Used for physics updates
      */
     fun updateAsync() {
-
+        sceneController.fixedUpdate()
     }
 
     override fun onScreenUpdate() {
-        glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+        sceneController.update()
+        renderFrame()
     }
 
-    /**
-     * Init resources here
-     */
     override fun onScreenInit() {
-
+        sceneController.init()
     }
 
     override fun onScreenShow() {
@@ -46,8 +48,19 @@ class GLSurfaceController(
 
     }
 
+    private fun renderFrame() {
+        val currentScene = sceneDispatcher.dispatchCurrent()
+        if (currentScene != null) {
+
+        }
+    }
+
     private fun initGL() {
         GL.createCapabilities()
-        glClearColor(1f, 0f, 0f, 0f)
+
+        glEnable(GL_TEXTURE_2D)
+        glEnable(GL_DEPTH_TEST)
+
+        glClearColor(0.0f, 0.85f, 0.85f, 1.0f)
     }
 }

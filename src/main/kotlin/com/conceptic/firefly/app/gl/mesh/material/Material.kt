@@ -17,4 +17,8 @@ data class Material(
     val texAmbient: Texture,
     val texDiffuse: Texture,
     val texSpecular: Texture
-)
+) {
+    companion object {
+        val EMPTY = Material("Empty", 0f, 0f, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Texture.NONE, Texture.NONE, Texture.NONE)
+    }
+}

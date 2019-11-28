@@ -8,4 +8,14 @@ class VesselObject : SceneObject() {
     override fun onDestroy() {
 
     }
+
+    override fun onFixedUpdate() {
+
+    }
+
+    override fun onUpdate() {
+
+    }
+
+    override fun retainSelfInstance(): Boolean = false
 }

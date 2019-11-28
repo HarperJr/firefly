@@ -1,8 +1,7 @@
 package com.conceptic.firefly.app
 
 import com.conceptic.firefly.app.gl.GLSurfaceController
-import com.conceptic.firefly.app.gl.shader.ShaderStore
-import com.conceptic.firefly.app.scene.Scene
+import com.conceptic.firefly.app.scene.SceneManager
 import com.conceptic.firefly.di.applicationModule
 import com.conceptic.firefly.log.Logger
 import com.conceptic.firefly.screen.ScreenController
@@ -16,7 +15,8 @@ import java.util.concurrent.Executors
  */
 class Application(
     private val screenController: ScreenController,
-    private val glSurfaceController: GLSurfaceController
+    private val glSurfaceController: GLSurfaceController,
+    private val sceneManager: SceneManager
 ) : KoinComponent {
     private val logger = Logger.getLogger<Application>()
     private val fixedUpdatesExecutor = Executors.newSingleThreadExecutor()
