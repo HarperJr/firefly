@@ -9,19 +9,24 @@ import org.lwjgl.opengl.GL20
 
 
 class ShaderContentProvider private constructor(private val fileProvider: FileProvider) {
-    fun provide(shaderFileName: String): ByteArray = fileProvider.provideFileContent(shaderFileName)
+    fun provide(shaderFileName: String): ByteArray = fileProvider.provideFileContent(SHADERS_DIR + shaderFileName)
 
     companion object {
+        private const val SHADERS_DIR = "shaders/"
+
         fun fromFileProvider(fileProvider: FileProvider) = ShaderContentProvider(fileProvider)
     }
 }
 
-class ShaderLoader(private val shaderStore: ShaderStore) {
-    fun load(shaderContentProvider: ShaderContentProvider, shaderDefinition: ShaderDefinition): Shader {
+class ShaderLoader(
+    private val contentProvider: ShaderContentProvider,
+    private val shaderStore: ShaderStore
+) {
+    fun load(shaderDefinition: ShaderDefinition): Shader {
         val shader = shaderStore.get(shaderDefinition)
         return kotlin.runCatching {
             val shaderScripts = shaderDefinition.scripts.map { shaderScript ->
-                val shaderScriptContent = shaderContentProvider.provide(shaderScript.name)
+                val shaderScriptContent = contentProvider.provide(shaderScript.name)
                 createShader(shaderScript.glShaderType, String(shaderScriptContent))
                     .also { shader.attach(it) }
             }

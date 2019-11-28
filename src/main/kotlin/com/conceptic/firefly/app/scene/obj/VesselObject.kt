@@ -1,8 +1,9 @@
 package com.conceptic.firefly.app.scene.obj
 
-class VesselObject : SceneObject() {
-    override fun onCreate() {
+class VesselObject : SceneObject("Vessel") {
 
+    override fun onCreate() {
+        super.onCreate()
     }
 
     override fun onDestroy() {

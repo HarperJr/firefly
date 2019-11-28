@@ -6,6 +6,8 @@ import java.io.File
 import java.nio.charset.Charset
 
 interface FileProvider {
+    val available: Boolean
+
     fun provideFile(fileName: String): File
 
     fun provideFileContent(fileName: String): ByteArray
@@ -16,6 +18,9 @@ interface FileProvider {
 }
 
 object ExternalStorageFileProvider : FileProvider {
+    override val available: Boolean
+        get() = false
+
     @Throws(IllegalArgumentException::class)
     override fun provideFile(fileName: String): File {
         val file = File(fileName)
@@ -50,7 +55,11 @@ object ExternalStorageFileProvider : FileProvider {
 }
 
 object ResourcesFileProvider : FileProvider {
-    private val classLoader = ClassLoader::class.java.classLoader
+    override val available: Boolean
+        get() = runCatching { classLoader }.getOrNull()?.let { true } ?: false
+
+    private val classLoader
+        get() = ResourcesFileProvider::class.java.classLoader
 
     override fun provideFile(fileName: String): File {
         val resource = classLoader.getResource(fileName)

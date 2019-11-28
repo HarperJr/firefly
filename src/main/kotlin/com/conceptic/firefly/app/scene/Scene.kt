@@ -1,8 +1,6 @@
 package com.conceptic.firefly.app.scene
 
-import com.conceptic.firefly.app.gl.renderer.Renderable
-
-abstract class Scene: Renderable {
+abstract class Scene {
     abstract fun onCreate()
 
     abstract fun onDestroy()

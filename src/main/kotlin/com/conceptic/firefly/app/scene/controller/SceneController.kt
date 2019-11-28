@@ -1,17 +1,23 @@
 package com.conceptic.firefly.app.scene.controller
 
-import com.conceptic.firefly.app.scene.Scene
+import com.conceptic.firefly.app.scene.SceneDispatcher
 
-abstract class SceneController(
-    private val scene: Scene
+class SceneController(
+    private val sceneDispatcher: SceneDispatcher
 ) {
     fun init() {
 
     }
 
-    abstract fun update()
+    fun update() {
 
-    abstract fun fixedUpdate()
+    }
 
-    abstract fun destroy()
+    fun fixedUpdate() {
+
+    }
+
+    fun destroy() {
+
+    }
 }

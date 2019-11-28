@@ -1,11 +1,13 @@
 package com.conceptic.firefly.app.scene.obj
 
-abstract class SceneObject {
-    abstract fun onCreate()
-
-    abstract fun onDestroy()
-
+abstract class SceneObject(private val resource: String) {
     abstract fun retainSelfInstance(): Boolean
+
+    open fun onDestroy() {
+
+    }
+
+    open fun onCreate() {}
 
     open fun onUpdate() {}
 
