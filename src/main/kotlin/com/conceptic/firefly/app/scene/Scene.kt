@@ -1,10 +1,8 @@
 package com.conceptic.firefly.app.scene
 
-import com.conceptic.firefly.app.scene.obj.SceneObject
+abstract class Scene {
+    abstract val name: String
 
-abstract class Scene(
-    private val sceneDispatcher: SceneDispatcher
-) {
     abstract fun retainSelfInstance(): Boolean
 
     open fun onCreate() {
@@ -22,8 +20,4 @@ abstract class Scene(
     open fun onUpdate() {
 
     }
-
-    protected fun instansiate(obj: SceneObject) = sceneDispatcher.addObj(obj)
-
-    protected fun annihilate(obj: SceneObject) = sceneDispatcher.removeObj(obj)
 }

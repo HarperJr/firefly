@@ -4,12 +4,12 @@ import com.conceptic.firefly.app.scene.obj.SceneObject
 import org.koin.core.KoinComponent
 
 class SceneDispatcher : KoinComponent {
-    private var currentScene: Scene? = null
+    private var currentScene: SceneWrapper? = null
     private var sceneObjects = mutableMapOf<String, MutableList<SceneObject>>()
 
     fun addObj(sceneObject: SceneObject) {
         currentScene?.let { scene ->
-            val objectsPool = sceneObjects.getOrPut(resolveName(scene)) { mutableListOf() }
+            val objectsPool = sceneObjects.getOrPut(scene.name) { mutableListOf() }
             if (!objectsPool.contains(sceneObject)) {
                 if (objectsPool.add(sceneObject))
                     sceneObject.onCreate()
@@ -19,16 +19,16 @@ class SceneDispatcher : KoinComponent {
 
     fun removeObj(sceneObject: SceneObject) {
         currentScene?.let { scene ->
-            sceneObjects[resolveName(scene)]?.remove(sceneObject)
+            sceneObjects[scene.name]?.remove(sceneObject)
         }
     }
 
     fun resetCurrent(scene: Scene) {
+        val sceneWrapper = SceneWrapper(scene, this)
         currentScene?.let { scene ->
-            val key = resolveName(scene)
             scene.onDestroy()
             if (!scene.retainSelfInstance()) {
-                val objectsPool = sceneObjects[key]
+                val objectsPool = sceneObjects[scene.name]
                 objectsPool?.forEach {
                     if (!it.retainSelfInstance()) {
                         it.onDestroy()
@@ -38,20 +38,15 @@ class SceneDispatcher : KoinComponent {
             }
         }
 
-        currentScene = scene.also {
-            it.onCreate()
-        }
+        currentScene = sceneWrapper.also { it.onCreate() }
     }
 
     fun dispatchCurrent(): Scene? {
         return currentScene?.also { scene ->
-            sceneObjects[resolveName(scene)]?.forEach {
+            sceneObjects[scene.name]?.forEach {
                 it.onUpdate()
             }
             scene.onUpdate()
         }
     }
-
-    private fun resolveName(scene: Scene): String = scene::class.simpleName
-        ?: throw IllegalArgumentException("Invalid scene instance: $scene")
 }
