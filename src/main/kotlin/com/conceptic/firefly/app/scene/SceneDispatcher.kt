@@ -1,8 +1,9 @@
 package com.conceptic.firefly.app.scene
 
 import com.conceptic.firefly.app.scene.obj.SceneObject
+import org.koin.core.KoinComponent
 
-class SceneDispatcher {
+class SceneDispatcher : KoinComponent {
     private var currentScene: Scene? = null
     private var sceneObjects = mutableMapOf<String, MutableList<SceneObject>>()
 
