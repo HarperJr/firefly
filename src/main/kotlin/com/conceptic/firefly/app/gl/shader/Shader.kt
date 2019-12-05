@@ -45,6 +45,8 @@ abstract class Shader(private val shaderProgram: Int) {
     fun uniformVec3(uniform: String, vector3: Vector3) =
         GL20.glUniform3f(uniformLocation(uniform), vector3.x, vector3.y, vector3.z)
 
+    fun uniformInt(uniform: String, int: Int) = GL20.glUniform1i(uniformLocation(uniform), int)
+
     fun uniformVec4(uniform: String, vector4: Vector4) =
         GL20.glUniform4f(uniformLocation(uniform), vector4.x, vector4.y, vector4.z, vector4.w)
 
@@ -59,5 +61,8 @@ abstract class Shader(private val shaderProgram: Int) {
 
     companion object {
         private const val NO_PROGRAM = 0
+
+        const val U_PROJECTION_MATRIX = "projectionMatrix"
+        const val U_MODEL_VIEW_MATRIX = "modelViewMatrix"
     }
 }

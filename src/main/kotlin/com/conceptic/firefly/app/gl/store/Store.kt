@@ -10,6 +10,8 @@ abstract class Store<T, U> {
     fun get(key: T) = store[key] ?: create(key)
         .also { store[key] = it }
 
+    fun contains(t: T) = store.containsKey(t)
+
     fun clear() = store.forEach { t, u ->
         if (clear(t, u)) {
             store.remove(t)

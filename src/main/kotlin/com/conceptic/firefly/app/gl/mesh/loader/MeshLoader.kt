@@ -1,7 +1,7 @@
 package com.conceptic.firefly.app.gl.mesh.loader
 
 import com.conceptic.firefly.app.gl.mesh.Mesh
-import com.conceptic.firefly.app.gl.mesh.material.Material
+import com.conceptic.firefly.app.gl.mesh.material.MeshMaterial
 import com.conceptic.firefly.app.gl.support.Vector3
 import com.conceptic.firefly.app.gl.support.Vector4
 import com.conceptic.firefly.app.gl.texture.TextureLoader
@@ -43,7 +43,7 @@ class MeshLoader(
         } ?: throw IllegalArgumentException("Unable to load mesh: $meshFileName")
     }
 
-    private fun loadRawSubMeshes(scene: AIScene, materials: List<Material>): List<Mesh> {
+    private fun loadRawSubMeshes(scene: AIScene, meshMaterials: List<MeshMaterial>): List<Mesh> {
         val numMeshes = scene.mNumMeshes()
         val meshesPointerBuffer = scene.mMeshes()
         return if (meshesPointerBuffer != null) {
@@ -72,13 +72,13 @@ class MeshLoader(
                     .setTexCoordinates(texCoordinates)
                     .setNormals(normals)
                     .setElements(elements)
-                    .setMaterial(materials[materialIndex])
+                    .setMaterial(meshMaterials[materialIndex])
                     .build()
             }
         } else emptyList()
     }
 
-    private fun loadRawMaterials(scene: AIScene): List<Material> {
+    private fun loadRawMaterials(scene: AIScene): List<MeshMaterial> {
         val numMaterials = scene.mNumMaterials()
         val materialsPointerBuffer = scene.mMaterials()
         return if (materialsPointerBuffer != null) {
@@ -97,7 +97,7 @@ class MeshLoader(
                 val texDiffuse = getTexture(rawMaterial, Assimp.aiTextureType_DIFFUSE)
                 val texSpecular = getTexture(rawMaterial, Assimp.aiTextureType_SPECULAR)
 
-                Material(
+                MeshMaterial(
                     name = name,
                     dissolveFactor = ambient.w,
                     specularFactor = specular.w,

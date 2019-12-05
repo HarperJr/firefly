@@ -23,6 +23,8 @@ class ShaderLoader(
     private val shaderStore: ShaderStore
 ) {
     fun load(shaderDefinition: ShaderDefinition): Shader {
+        if (shaderStore.contains(shaderDefinition))
+            return shaderStore.get(shaderDefinition)
         val shader = shaderStore.get(shaderDefinition)
         return kotlin.runCatching {
             val shaderScripts = shaderDefinition.scripts.map { shaderScript ->

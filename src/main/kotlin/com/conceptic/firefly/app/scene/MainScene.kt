@@ -1,17 +1,6 @@
 package com.conceptic.firefly.app.scene
 
-import com.conceptic.firefly.app.scene.obj.VesselObject
-
-class MainScene(sceneDispatcher: SceneDispatcher) : Scene(sceneDispatcher) {
+class MainScene : Scene() {
+    override val name = "MainScene"
     override fun retainSelfInstance(): Boolean = false
-
-    override fun onCreate() {
-        super.onCreate()
-
-        instansiate(VesselObject())
-    }
-
-    override fun onDestroy() {
-
-    }
 }

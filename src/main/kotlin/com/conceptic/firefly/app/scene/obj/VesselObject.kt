@@ -1,6 +1,8 @@
 package com.conceptic.firefly.app.scene.obj
 
-class VesselObject : SceneObject("Vessel") {
+import com.conceptic.firefly.app.scene.res.Resources
+
+class VesselObject : SceneObject(Resources.VESSEL) {
 
     override fun onCreate() {
         super.onCreate()

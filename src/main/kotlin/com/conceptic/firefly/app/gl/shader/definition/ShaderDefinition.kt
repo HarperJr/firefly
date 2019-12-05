@@ -1,7 +1,8 @@
 package com.conceptic.firefly.app.gl.shader.definition
 
 import com.conceptic.firefly.app.gl.shader.Shader
-import com.conceptic.firefly.app.gl.shader.solid.SolidShader
+import com.conceptic.firefly.app.gl.shader.solid.MeshShader
+import com.conceptic.firefly.app.gl.shader.view.ViewShader
 import kotlin.reflect.full.primaryConstructor
 
 sealed class ShaderDefinition(val name: String) {
@@ -13,11 +14,20 @@ sealed class ShaderDefinition(val name: String) {
         ?: throw IllegalStateException("Unable to create shader of type ${T::class.simpleName}")
 }
 
-object SolidShaderDefinition : ShaderDefinition("Solid") {
+object MeshShaderDefinition : ShaderDefinition("Mesh") {
     override val scripts: List<ShaderScript>
         get() = listOf(script<VertexShader>(), script<FragmentShader>())
 
     override fun initShader(shaderProgram: Int): Shader {
-        return SolidShader(shaderProgram).init()
+        return MeshShader(shaderProgram).init()
+    }
+}
+
+object ViewShaderDefinition : ShaderDefinition("View") {
+    override val scripts: List<ShaderScript>
+        get() = listOf(script<VertexShader>(), script<FragmentShader>())
+
+    override fun initShader(shaderProgram: Int): Shader {
+        return ViewShader(shaderProgram).init()
     }
 }

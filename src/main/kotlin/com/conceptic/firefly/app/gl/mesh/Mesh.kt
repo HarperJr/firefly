@@ -1,6 +1,6 @@
 package com.conceptic.firefly.app.gl.mesh
 
-import com.conceptic.firefly.app.gl.mesh.material.Material
+import com.conceptic.firefly.app.gl.mesh.material.MeshMaterial
 import com.conceptic.firefly.app.gl.renderer.Renderable
 import com.conceptic.firefly.app.gl.support.Vector3
 import com.conceptic.firefly.utils.Sha1
@@ -15,7 +15,7 @@ class Mesh private constructor(
     val texCoordinates: List<Vector3>,
     val normals: List<Vector3>,
     val elements: IntArray,
-    val material: Material
+    val material: MeshMaterial
 ) : Renderable {
     val uniqueIndex = Sha1.encode(name)
 
@@ -28,7 +28,7 @@ class Mesh private constructor(
         private val texCoordinates = mutableListOf<Vector3>()
         private val normals = mutableListOf<Vector3>()
         private val elements = mutableListOf<Int>()
-        private var material = Material.EMPTY
+        private var material = MeshMaterial.EMPTY
 
         fun setVertices(vertices: List<Vector3>) = this.apply { this.vertices.addAll(vertices) }
 
@@ -40,7 +40,7 @@ class Mesh private constructor(
 
         fun build() = Mesh(name, vertices, texCoordinates, normals, elements.toIntArray(), material)
 
-        fun setMaterial(material: Material) = this.apply { this.material = material }
+        fun setMaterial(material: MeshMaterial) = this.apply { this.material = material }
     }
 
     override fun equals(other: Any?): Boolean {

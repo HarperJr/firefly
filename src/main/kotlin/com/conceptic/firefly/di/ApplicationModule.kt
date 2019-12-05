@@ -5,6 +5,7 @@ import com.conceptic.firefly.app.camera.CameraController
 import com.conceptic.firefly.app.gl.GLSurfaceController
 import com.conceptic.firefly.app.gl.mesh.loader.MeshContentProvider
 import com.conceptic.firefly.app.gl.mesh.loader.MeshLoader
+import com.conceptic.firefly.app.gl.renderer.factory.RendererFactoriesProvider
 import com.conceptic.firefly.app.gl.shader.ShaderStore
 import com.conceptic.firefly.app.gl.shader.loader.ShaderContentProvider
 import com.conceptic.firefly.app.gl.shader.loader.ShaderLoader
@@ -13,6 +14,8 @@ import com.conceptic.firefly.app.gl.texture.TextureLoader
 import com.conceptic.firefly.app.gl.texture.TextureStore
 import com.conceptic.firefly.app.scene.MainScene
 import com.conceptic.firefly.app.scene.SceneDispatcher
+import com.conceptic.firefly.app.scene.SceneFactories
+import com.conceptic.firefly.app.scene.SceneFactory
 import com.conceptic.firefly.app.scene.controller.SceneController
 import com.conceptic.firefly.screen.ScreenController
 import com.conceptic.firefly.screen.support.KeyActionsPublisher
@@ -50,11 +53,6 @@ val applicationModule = module {
         scoped { ShaderStore() }
 
         /**
-         * Scenes
-         */
-        factory { MainScene(get()) }
-
-        /**
          * Controllers
          */
         factory { ScreenController(get(), get()) }
@@ -66,6 +64,9 @@ val applicationModule = module {
         factory { ShaderLoader(ShaderContentProvider.fromFileProvider(get()), get()) }
         factory { TextureLoader(TextureContentProvider.fromFileProvider(get()), get()) }
 
-        scoped { Application(get(), get(), get()) }
+        factory { SceneFactories() }
+        factory { RendererFactoriesProvider(get(), get()) }
+
+        scoped { Application(get(), get(), get(), get()) }
     }
 }
