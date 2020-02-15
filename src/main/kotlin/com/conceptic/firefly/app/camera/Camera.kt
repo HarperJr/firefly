@@ -6,30 +6,33 @@ import org.lwjgl.opengl.GL11.*
 
 class Camera {
     private var position = Vector3.ZERO
-
-    fun setupProjection(width: Int, height: Int) {
-        val aspect = if (height != 0) width.toFloat() / height.toFloat() else 0f
-
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-
-        MatrixUtils.setPerspective(PROJECTION_FOV, aspect, PROJECTION_NEAR, PROJECTION_FAR)
-        glLoadMatrixf(MatrixUtils.projectionMatrixAsBuffer)
-
-        glMatrixMode(GL_MODELVIEW)
-    }
+    private var isPerspectiveProjection = false
+    private var zNear = -1f
+    private var zFar = 1f
+    private var fov = 60f
 
     fun move(vector: Vector3) {
         position = vector
     }
 
-    fun update() {
+    fun update(width: Int, height: Int) {
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
 
+        if (isPerspectiveProjection) {
+            val aspect = if (height != 0) width.toFloat() / height.toFloat() else 0f
+            MatrixUtils.setPerspective(fov, aspect, zNear, zFar)
+        } else MatrixUtils.setOrtho(0f, width.toFloat(), height.toFloat(), 0f, zNear, zFar)
+
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
+        glTranslatef(position.x, position.y, position.z)
     }
 
-    companion object {
-        private const val PROJECTION_FOV = 60f
-        private const val PROJECTION_NEAR = 0f
-        private const val PROJECTION_FAR = 3000f
+    fun setSettings(isPerspectiveProjection: Boolean, zNear: Float, zFar: Float, fov: Float) {
+        this.isPerspectiveProjection = isPerspectiveProjection
+        this.zNear = zNear
+        this.zFar = zFar
+        this.fov = fov
     }
 }

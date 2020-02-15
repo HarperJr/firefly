@@ -5,6 +5,6 @@ data class Texture(
     val glPointer: Int
 ) {
     companion object {
-        val NONE = Texture("None", -1)
+        val NONE = Texture("NONE", -1)
     }
 }

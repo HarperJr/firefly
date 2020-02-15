@@ -3,9 +3,7 @@
 struct Material {
     float dissolveFactor;
     vec3 ambient;
-    vec3 diffuse;
     sampler2D texAmbient;
-    sampler2D texDiffuse;
 };
 
 uniform Material material;

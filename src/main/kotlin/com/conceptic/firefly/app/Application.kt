@@ -1,8 +1,6 @@
 package com.conceptic.firefly.app
 
-import com.conceptic.firefly.app.gl.GLSurfaceController
-import com.conceptic.firefly.app.scene.SceneDispatcher
-import com.conceptic.firefly.app.scene.SceneFactories
+import com.conceptic.firefly.app.gl.GLController
 import com.conceptic.firefly.di.applicationModule
 import com.conceptic.firefly.log.Logger
 import com.conceptic.firefly.screen.ScreenController
@@ -16,9 +14,7 @@ import java.util.concurrent.Executors
  */
 class Application(
     private val screenController: ScreenController,
-    private val glSurfaceController: GLSurfaceController,
-    private val sceneDispatcher: SceneDispatcher,
-    private val sceneFactories: SceneFactories
+    private val glController: GLController
 ) : KoinComponent {
     private val logger = Logger.getLogger<Application>()
     private val fixedUpdatesExecutor = Executors.newSingleThreadExecutor()
@@ -26,16 +22,15 @@ class Application(
     private var needsUpdates = false
 
     fun run() {
-        init()
-        runLoop()
-    }
+        screenController.init()
+        glController.init()
 
-    private fun runLoop() {
         needsUpdates = true
         runCatching {
             screenController.show()
             runFixedUpdates()
             while (needsUpdates) {
+                //Just update the screen and all subscribers to screen's updates will update theirs states
                 screenController.update()
                 needsUpdates = screenController.isActive()
             }
@@ -46,19 +41,17 @@ class Application(
     }
 
     private fun runFixedUpdates() {
+        var currentTimeMillis = System.currentTimeMillis()
         fixedUpdatesExecutor.submit {
             kotlin.runCatching {
                 while (needsUpdates) {
-                    glSurfaceController.updateAsync()
-                    Thread.sleep(FIXED_UPDATES_COOLDOWN)
+                    if (currentTimeMillis + FIXED_UPDATES_COOLDOWN >= System.currentTimeMillis()) {
+                        glController.updateAsync()
+                        currentTimeMillis = System.currentTimeMillis()
+                    }
                 }
             }
         }
-    }
-
-    private fun init() {
-        screenController.init()
-        sceneDispatcher.resetCurrent(sceneFactories.mainSceneFactory.create())
     }
 
     companion object {
@@ -68,10 +61,8 @@ class Application(
         fun runApplication() = startKoin { modules(applicationModule) }
             .also {
                 val appScope = it.koin.createScope(APP_SCOPE, named<Application>())
-
                 val application = appScope.get<Application>()
                 application.run()
-
                 it.koin.deleteScope(APP_SCOPE)
             }
     }

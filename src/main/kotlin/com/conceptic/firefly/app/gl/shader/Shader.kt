@@ -8,15 +8,16 @@ import java.nio.FloatBuffer
 
 abstract class Shader(private val shaderProgram: Int) {
     protected abstract val uniforms: List<String>
+    private val standardUniforms = listOf(U_PROJECTION_MATRIX, U_MODEL_VIEW_MATRIX)
 
     fun init() = this.apply {
+        val uniforms = standardUniforms.union(uniforms)
         uniforms.forEach { uniform ->
             uniformLocations[uniform] = GL20.glGetUniformLocation(shaderProgram, uniform)
         }
     }
 
     fun use(process: Shader.() -> Unit) {
-        GL20.glValidateProgram(shaderProgram)
         GL20.glUseProgram(shaderProgram)
         process.invoke(this)
         GL20.glUseProgram(NO_PROGRAM)
@@ -27,6 +28,7 @@ abstract class Shader(private val shaderProgram: Int) {
     }
 
     fun link() {
+        GL20.glValidateProgram(shaderProgram)
         GL20.glLinkProgram(shaderProgram)
 
         if (GL20.glGetProgrami(shaderProgram, GL20.GL_LINK_STATUS) == GL11.GL_FALSE) {

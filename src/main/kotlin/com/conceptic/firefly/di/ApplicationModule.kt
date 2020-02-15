@@ -2,21 +2,16 @@ package com.conceptic.firefly.di
 
 import com.conceptic.firefly.app.Application
 import com.conceptic.firefly.app.camera.CameraController
-import com.conceptic.firefly.app.gl.GLSurfaceController
-import com.conceptic.firefly.app.gl.mesh.loader.MeshContentProvider
-import com.conceptic.firefly.app.gl.mesh.loader.MeshLoader
-import com.conceptic.firefly.app.gl.renderer.factory.RendererFactoriesProvider
+import com.conceptic.firefly.app.gl.GLController
+import com.conceptic.firefly.app.gl.MenuController
+import com.conceptic.firefly.app.gl.renderable.mesh.loader.MeshContentProvider
+import com.conceptic.firefly.app.gl.renderable.mesh.loader.MeshLoader
 import com.conceptic.firefly.app.gl.shader.ShaderStore
 import com.conceptic.firefly.app.gl.shader.loader.ShaderContentProvider
 import com.conceptic.firefly.app.gl.shader.loader.ShaderLoader
 import com.conceptic.firefly.app.gl.texture.TextureContentProvider
 import com.conceptic.firefly.app.gl.texture.TextureLoader
 import com.conceptic.firefly.app.gl.texture.TextureStore
-import com.conceptic.firefly.app.scene.MainScene
-import com.conceptic.firefly.app.scene.SceneDispatcher
-import com.conceptic.firefly.app.scene.SceneFactories
-import com.conceptic.firefly.app.scene.SceneFactory
-import com.conceptic.firefly.app.scene.controller.SceneController
 import com.conceptic.firefly.screen.ScreenController
 import com.conceptic.firefly.screen.support.KeyActionsPublisher
 import com.conceptic.firefly.screen.support.MouseActionsPublisher
@@ -28,6 +23,17 @@ import org.koin.dsl.module
 
 val applicationModule = module {
     single { ShaderStore() }
+    single { TextureStore() }
+
+    single {
+        MeshLoader(
+            MeshContentProvider.fromFileProvider(
+                get()
+            ), get()
+        )
+    }
+    single { ShaderLoader(ShaderContentProvider.fromFileProvider(get()), get()) }
+    single { TextureLoader(TextureContentProvider.fromFileProvider(get()), get()) }
 
     scope(named<Application>()) {
         /**
@@ -40,7 +46,6 @@ val applicationModule = module {
         /**
          * Other
          */
-        scoped { SceneDispatcher() }
         scoped {
             when {
                 ResourcesFileProvider.available -> ResourcesFileProvider
@@ -49,24 +54,14 @@ val applicationModule = module {
             }
         }
 
-        scoped { TextureStore() }
-        scoped { ShaderStore() }
-
         /**
          * Controllers
          */
-        factory { ScreenController(get(), get()) }
-        factory { CameraController(get()) }
-        factory { SceneController(get()) }
-        factory { GLSurfaceController(get(), get(), get()) }
+        scoped { ScreenController(get(), get()) }
+        scoped { CameraController(get()) }
+        scoped { GLController(get(), get()) }
+        scoped { MenuController(get()) }
 
-        factory { MeshLoader(MeshContentProvider.fromFileProvider(get()), get()) }
-        factory { ShaderLoader(ShaderContentProvider.fromFileProvider(get()), get()) }
-        factory { TextureLoader(TextureContentProvider.fromFileProvider(get()), get()) }
-
-        factory { SceneFactories() }
-        factory { RendererFactoriesProvider(get(), get()) }
-
-        scoped { Application(get(), get(), get(), get()) }
+        scoped { Application(get(), get()) }
     }
 }

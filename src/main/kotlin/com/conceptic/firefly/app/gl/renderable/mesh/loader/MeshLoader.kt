@@ -1,13 +1,13 @@
-package com.conceptic.firefly.app.gl.mesh.loader
+package com.conceptic.firefly.app.gl.renderable.mesh.loader
 
-import com.conceptic.firefly.app.gl.mesh.Mesh
-import com.conceptic.firefly.app.gl.mesh.material.MeshMaterial
-import com.conceptic.firefly.app.gl.support.Vector3
+import com.conceptic.firefly.app.gl.renderable.mesh.Mesh
+import com.conceptic.firefly.app.gl.renderable.mesh.material.MeshMaterial
 import com.conceptic.firefly.app.gl.support.Vector4
 import com.conceptic.firefly.app.gl.texture.TextureLoader
 import com.conceptic.firefly.utils.FileProvider
 import org.lwjgl.assimp.*
 import java.nio.ByteBuffer
+import java.nio.FloatBuffer
 import java.nio.IntBuffer
 import java.nio.file.Paths
 
@@ -19,7 +19,8 @@ class MeshContentProvider private constructor(private val fileProvider: FileProv
     companion object {
         private const val MESH_DIR = "meshes/"
 
-        fun fromFileProvider(fileProvider: FileProvider) = MeshContentProvider(fileProvider)
+        fun fromFileProvider(fileProvider: FileProvider) =
+            MeshContentProvider(fileProvider)
     }
 }
 
@@ -51,29 +52,49 @@ class MeshLoader(
                 val rawMesh = AIMesh.create(meshesPointerBuffer.get(index))
                 val name = rawMesh.mName().dataString()
 
-                val vertices = rawMesh.mVertices().map { vertex -> Vector3(vertex.x(), vertex.y(), vertex.z()) }
-                val texCoordinates = rawMesh.mTextureCoords(0)
-                    ?.map { texCoord -> Vector3(texCoord.x(), texCoord.y(), texCoord.z()) } ?: emptyList()
-                val normals = rawMesh.mNormals()
-                    ?.map { normal -> Vector3(normal.x(), normal.y(), normal.z()) } ?: emptyList()
-
-                val elements = with(mutableListOf<Int>()) {
-                    rawMesh.mFaces().map { face ->
-                        val indexes = face.mIndices()
-                        Array(size = indexes.remaining()) { indexes.get(index) }
-                    }.forEach { this@with.addAll(it) }
-                    this
+                val vertices = rawMesh.mVertices().let { vert ->
+                    val verticesBuffer = FloatArray(size = vert.count() * VERTICES_DIMENSION_SCALE)
+                    vert.forEachIndexed { i, vec ->
+                        verticesBuffer[i * VERTICES_DIMENSION_SCALE + 0] = vec.x()
+                        verticesBuffer[i * VERTICES_DIMENSION_SCALE + 1] = vec.y()
+                        verticesBuffer[i * VERTICES_DIMENSION_SCALE + 2] = vec.z()
+                    }
+                    FloatBuffer.wrap(verticesBuffer)
                 }
 
-                val materialIndex = rawMesh.mMaterialIndex()
+                val texCoordinates = rawMesh.mTextureCoords(0)?.let { texCoords ->
+                    val texCoordinatesBuffer = FloatArray(size = texCoords.count() * TEXCOORDS_DIMENSION_SCALE)
+                    texCoords.forEachIndexed { i, vec ->
+                        texCoordinatesBuffer[i * TEXCOORDS_DIMENSION_SCALE + 0] = vec.x()
+                        texCoordinatesBuffer[i * TEXCOORDS_DIMENSION_SCALE + 1] = vec.y()
+                    }
+                    FloatBuffer.wrap(texCoordinatesBuffer)
+                }
 
-                Mesh.Builder(name)
+                val normals = rawMesh.mNormals()?.let { norms ->
+                    val texCoordinatesBuffer = FloatArray(size = norms.count() * NORMALS_DIMENSION_SCALE)
+                    norms.forEachIndexed { i, vec ->
+                        texCoordinatesBuffer[i * NORMALS_DIMENSION_SCALE + 0] = vec.x()
+                        texCoordinatesBuffer[i * NORMALS_DIMENSION_SCALE + 1] = vec.y()
+                        texCoordinatesBuffer[i * NORMALS_DIMENSION_SCALE + 2] = vec.z()
+                    }
+                    FloatBuffer.wrap(texCoordinatesBuffer)
+                }
+
+                val elements = rawMesh.mFaces().mIndices()
+
+                val materialIndex = rawMesh.mMaterialIndex()
+                val meshBuilder = Mesh.Builder(name)
                     .setVertices(vertices)
-                    .setTexCoordinates(texCoordinates)
-                    .setNormals(normals)
-                    .setElements(elements)
                     .setMaterial(meshMaterials[materialIndex])
-                    .build()
+                    .setElements(elements)
+
+                if (texCoordinates != null)
+                    meshBuilder.setTexCoordinates(texCoordinates)
+                if (normals != null)
+                    meshBuilder.setNormals(normals)
+
+                return@map meshBuilder.build()
             }
         } else emptyList()
     }
@@ -121,5 +142,11 @@ class MeshLoader(
     private fun getTexture(material: AIMaterial, type: Int) = with(AIString.calloc()) {
         Assimp.aiGetMaterialTexture(material, type, 0, this, null as IntBuffer?, null, null, null, null, null)
         this.dataString()
+    }
+
+    companion object {
+        private const val VERTICES_DIMENSION_SCALE = 3
+        private const val TEXCOORDS_DIMENSION_SCALE = 2
+        private const val NORMALS_DIMENSION_SCALE = 3
     }
 }

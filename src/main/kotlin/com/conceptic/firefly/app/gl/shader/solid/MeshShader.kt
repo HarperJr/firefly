@@ -1,6 +1,6 @@
 package com.conceptic.firefly.app.gl.shader.solid
 
-import com.conceptic.firefly.app.gl.mesh.material.MeshMaterial
+import com.conceptic.firefly.app.gl.renderable.mesh.material.MeshMaterial
 import com.conceptic.firefly.app.gl.shader.MaterialShader
 import com.conceptic.firefly.app.gl.shader.Shader
 

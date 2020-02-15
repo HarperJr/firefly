@@ -1,4 +1,4 @@
-package com.conceptic.firefly.app.gl.mesh.material
+package com.conceptic.firefly.app.gl.renderable.mesh.material
 
 import com.conceptic.firefly.app.gl.renderer.Material
 import com.conceptic.firefly.app.gl.support.Vector3
@@ -18,8 +18,19 @@ data class MeshMaterial(
     val texAmbient: Texture,
     val texDiffuse: Texture,
     val texSpecular: Texture
-): Material() {
+): Material {
     companion object {
-        val EMPTY = MeshMaterial("Empty", 0f, 0f, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Texture.NONE, Texture.NONE, Texture.NONE)
+        val EMPTY = MeshMaterial(
+            "Empty",
+            0f,
+            0f,
+            Vector3.ZERO,
+            Vector3.ZERO,
+            Vector3.ZERO,
+            Vector3.ZERO,
+            Texture.NONE,
+            Texture.NONE,
+            Texture.NONE
+        )
     }
 }

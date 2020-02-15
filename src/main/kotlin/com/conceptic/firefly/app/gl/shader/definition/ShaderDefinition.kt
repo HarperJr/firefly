@@ -10,7 +10,7 @@ sealed class ShaderDefinition(val name: String) {
 
     abstract fun initShader(shaderProgram: Int): Shader
 
-    protected inline fun <reified T : ShaderScript> script() = T::class.primaryConstructor?.call(name)
+    protected inline fun <reified T : ShaderScript> script(): ShaderScript = T::class.primaryConstructor?.call(name)
         ?: throw IllegalStateException("Unable to create shader of type ${T::class.simpleName}")
 }
 

@@ -1,7 +1,7 @@
 package com.conceptic.firefly.app.gl.vao
 
-import com.conceptic.firefly.app.gl.mesh.Mesh
-import com.conceptic.firefly.app.gl.renderer.Renderable
+import com.conceptic.firefly.app.gl.renderable.mesh.Mesh
+import com.conceptic.firefly.app.gl.renderable.Renderable
 import com.conceptic.firefly.app.gl.support.Vector3
 import com.conceptic.firefly.app.gl.vbo.Vbo
 import com.conceptic.firefly.app.gl.vbo.VboStore
@@ -27,22 +27,19 @@ class VaoBinder(
         val verticesVbo = vboStore.get(Vbo.elementsVbo(index))
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, verticesVbo)
 
-        val vertexBuffer = VectorUtils.bufferWrap(mesh.vertices)
-        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, vertexBuffer, GL30.GL_STATIC_DRAW)
+        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, mesh.vertices, GL30.GL_STATIC_DRAW)
         GL30.glVertexAttribPointer(0, Vector3.COMPONENTS, GL_FLOAT, false, 0, 0L)
 
         val texCoordinatesVbo = vboStore.get(Vbo.elementsVbo(index))
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, texCoordinatesVbo)
 
-        val texCoordinatesBuffer = VectorUtils.bufferWrap(mesh.texCoordinates)
-        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, texCoordinatesBuffer, GL30.GL_STATIC_DRAW)
+        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, mesh.texCoordinates, GL30.GL_STATIC_DRAW)
         GL30.glVertexAttribPointer(1, Vector3.COMPONENTS, GL_FLOAT, false, 0, 0L)
 
         val normalsVbo = vboStore.get(Vbo.elementsVbo(index))
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, normalsVbo)
 
-        val normalsBuffer = VectorUtils.bufferWrap(mesh.normals)
-        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, normalsBuffer, GL30.GL_STATIC_DRAW)
+        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, mesh.normals, GL30.GL_STATIC_DRAW)
         GL30.glVertexAttribPointer(2, Vector3.COMPONENTS, GL_FLOAT, false, 0, 0L)
 
         if (mesh.isOptimized) {

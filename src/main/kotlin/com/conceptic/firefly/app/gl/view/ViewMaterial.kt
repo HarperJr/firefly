@@ -1,4 +1,4 @@
-package com.conceptic.firefly.app.gl.view.material
+package com.conceptic.firefly.app.gl.view
 
 import com.conceptic.firefly.app.gl.renderer.Material
 import com.conceptic.firefly.app.gl.support.Vector3
@@ -11,8 +11,15 @@ data class ViewMaterial(
     val diffuse: Vector3,
     val texAmbient: Texture,
     val texDiffuse: Texture
-) : Material() {
+) : Material {
     companion object {
-        val EMPTY = ViewMaterial("Empty", 0f, Vector3.ZERO, Vector3.ZERO, Texture.NONE, Texture.NONE)
+        val EMPTY = ViewMaterial(
+            "Empty",
+            0f,
+            Vector3.ZERO,
+            Vector3.ZERO,
+            Texture.NONE,
+            Texture.NONE
+        )
     }
 }
