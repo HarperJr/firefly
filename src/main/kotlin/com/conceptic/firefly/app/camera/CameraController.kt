@@ -4,9 +4,7 @@ import com.conceptic.firefly.app.gl.support.Vector3
 import com.conceptic.firefly.screen.support.ScreenUpdatesPublisher
 import com.conceptic.firefly.screen.support.ScreenUpdatesSubscriberAdapter
 
-class CameraController(
-    private val screenUpdatesPublisher: ScreenUpdatesPublisher
-) : ScreenUpdatesSubscriberAdapter() {
+class CameraController {
     var cameraSettings: CameraSettings = CameraSettings.DEFAULT
         set(value) {
             field = value
@@ -17,17 +15,13 @@ class CameraController(
     private var currentWidth = 0
     private var currentHeight = 0
 
-    fun init() {
-        screenUpdatesPublisher.subscribe(this)
-    }
-
     fun move(vector3: Vector3) = camera.move(vector3)
 
-    override fun onScreenUpdate() {
+    fun update() {
         camera.update(currentWidth, currentHeight)
     }
 
-    override fun onScreenSizeChanged(width: Int, height: Int) {
+    fun changeProjectionSize(width: Int, height: Int) {
         this.currentWidth = width
         this.currentWidth = height
     }

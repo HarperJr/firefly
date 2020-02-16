@@ -10,7 +10,7 @@ class ViewRenderer(
     override fun render(renderable: View) {
         val shader = shaderResolver.resolve(renderable)
         shader.use {
-
+            
         }
     }
 

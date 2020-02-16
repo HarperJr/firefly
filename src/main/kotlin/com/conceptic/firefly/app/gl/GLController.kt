@@ -1,5 +1,6 @@
 package com.conceptic.firefly.app.gl
 
+import com.conceptic.firefly.app.gl.shader.loader.ShaderLoader
 import com.conceptic.firefly.log.Logger
 import com.conceptic.firefly.screen.support.ScreenUpdatesPublisher
 import com.conceptic.firefly.screen.support.ScreenUpdatesSubscriber

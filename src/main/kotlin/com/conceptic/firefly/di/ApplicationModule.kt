@@ -3,7 +3,6 @@ package com.conceptic.firefly.di
 import com.conceptic.firefly.app.Application
 import com.conceptic.firefly.app.camera.CameraController
 import com.conceptic.firefly.app.gl.GLController
-import com.conceptic.firefly.app.gl.MenuController
 import com.conceptic.firefly.app.gl.renderable.mesh.loader.MeshContentProvider
 import com.conceptic.firefly.app.gl.renderable.mesh.loader.MeshLoader
 import com.conceptic.firefly.app.gl.shader.ShaderStore
@@ -24,6 +23,8 @@ import org.koin.dsl.module
 val applicationModule = module {
     single { ShaderStore() }
     single { TextureStore() }
+
+    factory { CameraController() }
 
     single {
         MeshLoader(
@@ -58,9 +59,7 @@ val applicationModule = module {
          * Controllers
          */
         scoped { ScreenController(get(), get()) }
-        scoped { CameraController(get()) }
         scoped { GLController(get(), get()) }
-        scoped { MenuController(get()) }
 
         scoped { Application(get(), get()) }
     }
