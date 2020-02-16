@@ -1,12 +1,12 @@
 package com.conceptic.firefly.screen.support
 
-import com.conceptic.firefly.screen.Keys
+import com.conceptic.firefly.screen.Key
 import com.conceptic.firefly.support.Publisher
 
 interface KeyActionsSubscriber {
-    fun onKeyPressed(key: Keys)
+    fun onPressed(key: Key)
 
-    fun onKeyReleased(key: Keys)
+    fun onReleased(key: Key)
 }
 
 class KeyActionsPublisher : Publisher<KeyActionsSubscriber>()

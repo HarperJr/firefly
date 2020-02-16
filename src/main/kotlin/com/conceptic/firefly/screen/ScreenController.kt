@@ -1,11 +1,13 @@
 package com.conceptic.firefly.screen
 
 import com.conceptic.firefly.screen.support.KeyActionsPublisher
+import com.conceptic.firefly.screen.support.MouseActionsPublisher
 import com.conceptic.firefly.screen.support.ScreenUpdatesPublisher
 
 class ScreenController(
     private val screenUpdatesPublisher: ScreenUpdatesPublisher,
-    private val keyActionsPublisher: KeyActionsPublisher
+    private val keyActionsPublisher: KeyActionsPublisher,
+    private val mouseActionsPublisher: MouseActionsPublisher
 ) {
     private var screenWidth = DEFAULT_SCREEN_WIDTH
     private var screenHeight = DEFAULT_SCREEN_HEIGHT
@@ -13,13 +15,10 @@ class ScreenController(
     private var screen: GLFWScreen? = null
 
     fun init() {
-        screen = GLFWScreen.Builder()
-            .setTitle(TITLE)
-            .setFullscreen(false)
-            .setDimension(screenWidth, screenHeight)
-            .setKeyActionCallback(onKeyActionCallback)
-            .setScreenActionCallback(onScreenCommandCallback)
-            .build()
+        screen = GLFWScreen(
+            TITLE, screenWidth, screenHeight, false,
+            keyActionListener, screenActionListener, mouseActionListener
+        )
     }
 
     fun show() {
@@ -37,25 +36,31 @@ class ScreenController(
         screen = null
     }
 
-    private val onKeyActionCallback = { key: Keys, keyAction: KeyAction ->
-        keyActionsPublisher.notify {
-            when (keyAction) {
-                KeyAction.PRESS -> onKeyPressed(key)
-                KeyAction.RELEASE -> onKeyReleased(key)
-            }
-        }
+    private val keyActionListener = object : KeyActionListener {
+        override fun onPressed(key: Key) = keyActionsPublisher.notify { onPressed(key) }
+
+        override fun onReleased(key: Key) = keyActionsPublisher.notify { onReleased(key) }
     }
 
-    private val onScreenCommandCallback = { action: ScreenAction ->
-        screenUpdatesPublisher.notify {
-            when (action) {
-                is InitAction -> onScreenInit()
-                is ShowAction -> onScreenShow()
-                is UpdateAction -> onScreenUpdate()
-                is DestroyAction -> onScreenDestroy()
-                is SizeChangeAction -> onScreenSizeChanged(action.width, action.height)
-            }
-        }
+    private val screenActionListener = object : ScreenActionListener {
+        override fun onSizeChanged(width: Int, height: Int) =
+            screenUpdatesPublisher.notify { onSizeChanged(width, height) }
+
+        override fun onInit() = screenUpdatesPublisher.notify { onInit() }
+
+        override fun onShow() = screenUpdatesPublisher.notify { onShow() }
+
+        override fun onUpdate() = screenUpdatesPublisher.notify { onUpdate() }
+
+        override fun onDestroy() = screenUpdatesPublisher.notify { onDestroy() }
+    }
+
+    private val mouseActionListener = object : MouseActionListener {
+        override fun onClicked(x: Int, y: Int) = mouseActionsPublisher.notify { onClicked(x, y) }
+
+        override fun onDoubleClicked(x: Int, y: Int) = mouseActionsPublisher.notify { onDoubleClicked(x, y) }
+
+        override fun onMoved(x: Int, y: Int) = mouseActionsPublisher.notify { onMoved(x, y) }
     }
 
     companion object {

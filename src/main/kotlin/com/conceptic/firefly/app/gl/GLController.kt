@@ -30,7 +30,7 @@ class GLController(
 
     }
 
-    override fun onScreenUpdate() {
+    override fun onUpdate() {
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
         if (sceneIsLoaded) {
@@ -38,15 +38,15 @@ class GLController(
         } else menuController.update()
     }
 
-    override fun onScreenShow() {
+    override fun onShow() {
         GL.createCapabilities()
     }
 
-    override fun onScreenSizeChanged(width: Int, height: Int) {
+    override fun onSizeChanged(width: Int, height: Int) {
         glViewport(0, height, width, 0)
     }
 
-    override fun onScreenDestroy() {
+    override fun onDestroy() {
 
     }
 }

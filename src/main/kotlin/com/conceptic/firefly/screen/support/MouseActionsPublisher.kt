@@ -3,11 +3,11 @@ package com.conceptic.firefly.screen.support
 import com.conceptic.firefly.support.Publisher
 
 interface MouseActionsSubscriber {
-    fun onMouseMove(mouseX: Float, mouseY: Float)
+    fun onClicked(x: Int, y: Int)
 
-    fun onRightClick()
+    fun onDoubleClicked(x: Int, y: Int)
 
-    fun onLeftLick()
+    fun onMoved(x: Int, y: Int)
 }
 
 class MouseActionsPublisher : Publisher<MouseActionsSubscriber>()

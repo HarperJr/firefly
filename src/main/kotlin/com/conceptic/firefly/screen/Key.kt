@@ -5,7 +5,7 @@ import org.lwjgl.glfw.GLFW
 /**
  * All used keys are declared here
  */
-enum class Keys {
+enum class Key {
     ESC, WHITESPACE, A, W, D, S, UNDEFINED;
 
     companion object {

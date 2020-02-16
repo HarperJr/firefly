@@ -1,13 +1,13 @@
 package com.conceptic.firefly.screen.support
 
 open class ScreenUpdatesSubscriberAdapter : ScreenUpdatesSubscriber {
-    override fun onScreenInit() {}
+    override fun onInit() {}
 
-    override fun onScreenShow() {}
+    override fun onShow() {}
 
-    override fun onScreenSizeChanged(width: Int, height: Int) {}
+    override fun onSizeChanged(width: Int, height: Int) {}
 
-    override fun onScreenUpdate() {}
+    override fun onUpdate() {}
 
-    override fun onScreenDestroy() {}
+    override fun onDestroy() {}
 }

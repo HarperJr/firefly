@@ -3,15 +3,15 @@ package com.conceptic.firefly.screen.support
 import com.conceptic.firefly.support.Publisher
 
 interface ScreenUpdatesSubscriber {
-    fun onScreenInit()
+    fun onInit()
 
-    fun onScreenShow()
+    fun onShow()
 
-    fun onScreenSizeChanged(width: Int, height: Int)
+    fun onSizeChanged(width: Int, height: Int)
 
-    fun onScreenUpdate()
+    fun onUpdate()
 
-    fun onScreenDestroy()
+    fun onDestroy()
 }
 
 class ScreenUpdatesPublisher : Publisher<ScreenUpdatesSubscriber>()

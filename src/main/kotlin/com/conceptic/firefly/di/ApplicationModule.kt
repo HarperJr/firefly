@@ -1,7 +1,6 @@
 package com.conceptic.firefly.di
 
 import com.conceptic.firefly.app.Application
-import com.conceptic.firefly.app.camera.CameraController
 import com.conceptic.firefly.app.gl.GLController
 import com.conceptic.firefly.app.gl.renderable.mesh.loader.MeshContentProvider
 import com.conceptic.firefly.app.gl.renderable.mesh.loader.MeshLoader
@@ -24,15 +23,7 @@ val applicationModule = module {
     single { ShaderStore() }
     single { TextureStore() }
 
-    factory { CameraController() }
-
-    single {
-        MeshLoader(
-            MeshContentProvider.fromFileProvider(
-                get()
-            ), get()
-        )
-    }
+    single { MeshLoader(MeshContentProvider.fromFileProvider(get()), get()) }
     single { ShaderLoader(ShaderContentProvider.fromFileProvider(get()), get()) }
     single { TextureLoader(TextureContentProvider.fromFileProvider(get()), get()) }
 
@@ -58,7 +49,7 @@ val applicationModule = module {
         /**
          * Controllers
          */
-        scoped { ScreenController(get(), get()) }
+        scoped { ScreenController(get(), get(), get()) }
         scoped { GLController(get(), get()) }
 
         scoped { Application(get(), get()) }

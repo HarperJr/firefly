@@ -5,7 +5,6 @@ import com.conceptic.firefly.app.gl.renderable.Renderable
 import com.conceptic.firefly.app.gl.support.Vector3
 import com.conceptic.firefly.app.gl.vbo.Vbo
 import com.conceptic.firefly.app.gl.vbo.VboStore
-import com.conceptic.firefly.utils.VectorUtils
 import org.lwjgl.opengl.GL11.GL_FLOAT
 import org.lwjgl.opengl.GL30
 
