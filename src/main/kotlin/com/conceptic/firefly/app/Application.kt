@@ -1,6 +1,5 @@
 package com.conceptic.firefly.app
 
-import com.conceptic.firefly.app.gl.GLController
 import com.conceptic.firefly.di.applicationModule
 import com.conceptic.firefly.log.Logger
 import com.conceptic.firefly.screen.ScreenController
@@ -8,45 +7,53 @@ import org.koin.core.KoinComponent
 import org.koin.core.context.startKoin
 import org.koin.core.qualifier.named
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Main class for application instance
  */
 class Application(
     private val screenController: ScreenController,
-    private val glController: GLController
+    private val gameController: GameController
 ) : KoinComponent {
     private val logger = Logger.getLogger<Application>()
     private val fixedUpdatesExecutor = Executors.newSingleThreadExecutor()
 
-    private var needsUpdates = false
+    private val needsUpdates: AtomicBoolean = AtomicBoolean(false)
 
     fun run() {
         screenController.init()
-        glController.init()
+        gameController.init()
 
-        needsUpdates = true
+        needsUpdates.set(true)
         runCatching {
             screenController.show()
             runFixedUpdates()
-            while (needsUpdates) {
+            while (needsUpdates.get()) {
                 //Just update the screen and all subscribers to screen's updates will update theirs states
                 screenController.update()
-                needsUpdates = screenController.isActive()
+                needsUpdates.set(screenController.isActive())
             }
-        }.onSuccess {
-            fixedUpdatesExecutor.shutdown()
-            screenController.destroy()
-        }.onFailure { logger.error(it) }
+        }.onSuccess { shutdown() }
+            .onFailure {
+                shutdown()
+                logger.error(it)
+            }
+    }
+
+    private fun shutdown() {
+        logger.info("Shutting down")
+        fixedUpdatesExecutor.shutdown()
+        screenController.destroy()
     }
 
     private fun runFixedUpdates() {
         var currentTimeMillis = System.currentTimeMillis()
         fixedUpdatesExecutor.submit {
             kotlin.runCatching {
-                while (needsUpdates) {
+                while (needsUpdates.get()) {
                     if (currentTimeMillis + FIXED_UPDATES_COOLDOWN >= System.currentTimeMillis()) {
-                        glController.updateAsync()
+                        gameController.updateAsync()
                         currentTimeMillis = System.currentTimeMillis()
                     }
                 }

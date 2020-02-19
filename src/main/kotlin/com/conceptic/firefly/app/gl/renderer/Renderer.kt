@@ -6,4 +6,8 @@ interface Renderer<R : Renderable> {
     fun render(renderable: R)
 
     fun flush()
+
+    companion object {
+        const val NO_VERTEX_ARRAY = 0
+    }
 }

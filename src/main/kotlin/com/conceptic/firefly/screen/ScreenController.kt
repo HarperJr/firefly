@@ -1,5 +1,8 @@
 package com.conceptic.firefly.screen
 
+import com.conceptic.firefly.screen.listener.KeyActionListener
+import com.conceptic.firefly.screen.listener.MouseActionListener
+import com.conceptic.firefly.screen.listener.ScreenActionListener
 import com.conceptic.firefly.screen.support.KeyActionsPublisher
 import com.conceptic.firefly.screen.support.MouseActionsPublisher
 import com.conceptic.firefly.screen.support.ScreenUpdatesPublisher
@@ -46,9 +49,9 @@ class ScreenController(
         override fun onSizeChanged(width: Int, height: Int) =
             screenUpdatesPublisher.notify { onSizeChanged(width, height) }
 
-        override fun onInit() = screenUpdatesPublisher.notify { onInit() }
+        override fun onShow(width: Int, height: Int) = screenUpdatesPublisher.notify { onShow(width, height) }
 
-        override fun onShow() = screenUpdatesPublisher.notify { onShow() }
+        override fun onInit() = screenUpdatesPublisher.notify { onInit() }
 
         override fun onUpdate() = screenUpdatesPublisher.notify { onUpdate() }
 

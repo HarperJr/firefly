@@ -1,11 +1,11 @@
-package com.conceptic.firefly.screen
+package com.conceptic.firefly.screen.listener
 
 interface ScreenActionListener {
     fun onSizeChanged(width: Int, height: Int)
 
-    fun onInit()
+    fun onShow(width: Int, height: Int)
 
-    fun onShow()
+    fun onInit()
 
     fun onUpdate()
 

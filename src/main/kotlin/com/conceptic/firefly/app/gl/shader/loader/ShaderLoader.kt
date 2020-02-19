@@ -18,17 +18,16 @@ class ShaderContentProvider private constructor(private val fileProvider: FilePr
     }
 }
 
-class ShaderLoader(
-    private val contentProvider: ShaderContentProvider,
-    private val shaderStore: ShaderStore
-) {
+class ShaderLoader(fileProvider: FileProvider, private val shaderStore: ShaderStore) {
+    private val contentProvider = ShaderContentProvider.fromFileProvider(fileProvider)
+
     fun load(shaderDefinition: ShaderDefinition): Shader {
         if (shaderStore.contains(shaderDefinition))
-            return shaderStore.get(shaderDefinition)
-        val shader = shaderStore.get(shaderDefinition)
+            return shaderStore[shaderDefinition]!!
+        val shader = shaderStore.newInstance(shaderDefinition)
         return kotlin.runCatching {
             val shaderScripts = shaderDefinition.scripts.map { shaderScript ->
-                val shaderScriptContent = contentProvider.provide(shaderScript.name)
+                val shaderScriptContent = contentProvider.provide(shaderDefinition.sourceFolder + shaderScript.name)
                 createShader(shaderScript.glShaderType, String(shaderScriptContent))
                     .also { shader.attach(it) }
             }

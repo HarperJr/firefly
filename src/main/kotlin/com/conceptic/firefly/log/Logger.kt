@@ -3,13 +3,13 @@ package com.conceptic.firefly.log
 import org.apache.logging.log4j.LogManager
 
 interface Logger {
-    fun debug(message: String?, vararg params: Any)
+    fun debug(message: String?)
 
-    fun info(message: String?, vararg params: Any)
+    fun info(message: String?)
 
-    fun error(throwable: Throwable, vararg params: Any)
+    fun error(throwable: Throwable)
 
-    fun fatal(throwable: Throwable, vararg params: Any)
+    fun fatal(throwable: Throwable)
 
     companion object {
         val DEFAULT_LOGGER = Log4JLogger
@@ -36,13 +36,13 @@ object Log4JLogger : LoggerProvider {
     override fun provide(tag: String): Logger {
         val logger = LogManager.getLogger(tag)
         return object : Logger {
-            override fun debug(message: String?, vararg params: Any) = logger.debug(message, params)
+            override fun debug(message: String?) = logger.debug(message)
 
-            override fun info(message: String?, vararg params: Any) = logger.info(message, params)
+            override fun info(message: String?) = logger.info(message)
 
-            override fun error(throwable: Throwable, vararg params: Any) = logger.error(throwable.message, params)
+            override fun error(throwable: Throwable) = logger.error(throwable.message)
 
-            override fun fatal(throwable: Throwable, vararg params: Any) = logger.fatal(throwable.message, params)
+            override fun fatal(throwable: Throwable) = logger.fatal(throwable.message)
         }
     }
 }

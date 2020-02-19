@@ -38,7 +38,7 @@ class TextureLoader(
             pixelsByteBuffer.flip() as ByteBuffer
         }
 
-        val texture = textureStore.get(textureFileName)
+        val texture = textureStore.newInstance(textureFileName)
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.glPointer)
 
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST)

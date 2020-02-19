@@ -1,4 +1,4 @@
-package com.conceptic.firefly.screen
+package com.conceptic.firefly.screen.listener
 
 interface MouseActionListener {
     fun onClicked(x: Int, y: Int)

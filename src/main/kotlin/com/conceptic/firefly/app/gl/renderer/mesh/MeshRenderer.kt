@@ -15,13 +15,7 @@ class MeshRenderer(
         val shader = shaderResolver.resolve(renderable)
 
         shader.use {
-            if (renderable.isOptimized) {
-                glBindVertexArray(vaoStore.get(renderable.uniqueIndex))
-                GL11.glDrawElements(GL11.GL_TRIANGLE_STRIP, renderable.elements)
-                glBindVertexArray(0)
-            } else {
-                //todo another brunch of rendering process
-            }
+
         }
     }
 

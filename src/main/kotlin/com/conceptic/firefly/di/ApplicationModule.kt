@@ -1,7 +1,7 @@
 package com.conceptic.firefly.di
 
 import com.conceptic.firefly.app.Application
-import com.conceptic.firefly.app.gl.GLController
+import com.conceptic.firefly.app.GameController
 import com.conceptic.firefly.app.gl.renderable.mesh.loader.MeshContentProvider
 import com.conceptic.firefly.app.gl.renderable.mesh.loader.MeshLoader
 import com.conceptic.firefly.app.gl.shader.ShaderStore
@@ -20,13 +20,6 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val applicationModule = module {
-    single { ShaderStore() }
-    single { TextureStore() }
-
-    single { MeshLoader(MeshContentProvider.fromFileProvider(get()), get()) }
-    single { ShaderLoader(ShaderContentProvider.fromFileProvider(get()), get()) }
-    single { TextureLoader(TextureContentProvider.fromFileProvider(get()), get()) }
-
     scope(named<Application>()) {
         /**
          * Publishers
@@ -35,22 +28,12 @@ val applicationModule = module {
         scoped { KeyActionsPublisher() }
         scoped { MouseActionsPublisher() }
 
-        /**
-         * Other
-         */
-        scoped {
-            when {
-                ResourcesFileProvider.available -> ResourcesFileProvider
-                ExternalStorageFileProvider.available -> ExternalStorageFileProvider
-                else -> throw IllegalStateException("No file provider available, check security permission, or restart app as admin")
-            }
-        }
 
         /**
          * Controllers
          */
         scoped { ScreenController(get(), get(), get()) }
-        scoped { GLController(get(), get()) }
+        scoped { GameController(get(), get(), get()) }
 
         scoped { Application(get(), get()) }
     }

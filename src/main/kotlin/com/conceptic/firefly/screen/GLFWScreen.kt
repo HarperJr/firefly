@@ -1,13 +1,14 @@
 package com.conceptic.firefly.screen
 
 import com.conceptic.firefly.log.Logger
+import com.conceptic.firefly.screen.listener.KeyActionListener
+import com.conceptic.firefly.screen.listener.MouseActionListener
+import com.conceptic.firefly.screen.listener.ScreenActionListener
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.system.MemoryUtil.NULL
-
-typealias Dimensions = Pair<Int, Int>
 
 class GLFWScreen(
     title: String,
@@ -30,10 +31,8 @@ class GLFWScreen(
     var lastCursorYPost: Int = -1
 
     init {
-        screenActionListener.onInit()
-
         GLFWErrorCallback.createPrint(System.err)
-        if (!glfwInit()) throw IllegalStateException("Unable to init GLFW")
+        if (!glfwInit()) throw IllegalStateException("Unable to bindUniformLocations GLFW")
 
         glfwDefaultWindowHints()
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE)
@@ -60,8 +59,11 @@ class GLFWScreen(
 
         glfwSetMouseButtonCallback(window) { _, button, action, _ ->
             when (action) {
-                GLFW_RELEASE -> mouseActionListener.onClicked(this.lastCursorXPos, this.lastCursorYPost)
-                GLFW_REPEAT -> mouseActionListener.onDoubleClicked(this.lastCursorXPos, this.lastCursorYPost)
+                GLFW_RELEASE ->
+                    if (button == GLFW_MOUSE_BUTTON_LEFT)
+                        mouseActionListener.onClicked(this.lastCursorXPos, this.lastCursorYPost)
+                GLFW_REPEAT -> if (button == GLFW_MOUSE_BUTTON_LEFT)
+                    mouseActionListener.onDoubleClicked(this.lastCursorXPos, this.lastCursorYPost)
             }
         }
 
@@ -80,7 +82,7 @@ class GLFWScreen(
 
                 glfwGetWindowSize(window, pWidth, pHeight)
                 val vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor())
-                    ?: throw IllegalStateException("Unable to get video mode")
+                    ?: throw IllegalStateException("Unable to newInstance video mode")
 
                 glfwSetWindowPos(window, (vidMode.width() - pWidth[0]) / 2, (vidMode.height() - pHeight[0]) / 2)
 
@@ -93,18 +95,19 @@ class GLFWScreen(
 
         glfwMakeContextCurrent(window)
         glfwSwapInterval(1)
+
+        screenActionListener.onInit()
     }
 
     fun showWindow() {
         checkWindowNotNull()
-        screenActionListener.onShow()
-
         glfwShowWindow(window)
+        screenActionListener.onShow(width, height)
     }
 
     fun destroy() {
-        checkWindowNotNull()
         screenActionListener.onDestroy()
+        checkWindowNotNull()
 
         glfwFreeCallbacks(window)
         glfwDestroyWindow(window)

@@ -7,8 +7,9 @@ abstract class Store<T, U> {
 
     protected abstract fun clear(key: T, element: U): Boolean
 
-    fun get(key: T) = store[key] ?: create(key)
-        .also { store[key] = it }
+    fun newInstance(key: T) = create(key).also { store[key] = it }
+
+    fun remove(t: T) = store.remove(t)
 
     fun contains(t: T) = store.containsKey(t)
 
@@ -17,4 +18,6 @@ abstract class Store<T, U> {
             store.remove(t)
         }
     }
+
+    operator fun get(key: T): U = store[key] ?: throw IllegalStateException("No element associated to key = $key")
 }

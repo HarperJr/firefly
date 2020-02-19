@@ -4,12 +4,8 @@ import com.conceptic.firefly.app.gl.support.Vector3
 import com.conceptic.firefly.utils.MatrixUtils
 import org.lwjgl.opengl.GL11.*
 
-class Camera {
+class Camera(private val cameraSettings: CameraSettings) {
     private var position = Vector3.ZERO
-    private var isPerspectiveProjection = false
-    private var zNear = -1f
-    private var zFar = 1f
-    private var fov = 60f
 
     fun move(vector: Vector3) {
         position = vector
@@ -19,20 +15,43 @@ class Camera {
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
 
-        if (isPerspectiveProjection) {
+        if (cameraSettings.isPerspective) {
             val aspect = if (height != 0) width.toFloat() / height.toFloat() else 0f
-            MatrixUtils.setPerspective(fov, aspect, zNear, zFar)
-        } else MatrixUtils.setOrtho(0f, width.toFloat(), height.toFloat(), 0f, zNear, zFar)
+            MatrixUtils.setPerspective(cameraSettings.fov, aspect, cameraSettings.zNear, cameraSettings.zFar)
+        } else MatrixUtils.setOrtho(0f, width.toFloat(), height.toFloat(), 0f, cameraSettings.zNear, cameraSettings.zFar)
 
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
         glTranslatef(position.x, position.y, position.z)
     }
 
-    fun setSettings(isPerspectiveProjection: Boolean, zNear: Float, zFar: Float, fov: Float) {
-        this.isPerspectiveProjection = isPerspectiveProjection
-        this.zNear = zNear
-        this.zFar = zFar
-        this.fov = fov
+    class CameraSettings private constructor(
+        val isPerspective: Boolean,
+        val zNear: Float,
+        val zFar: Float,
+        val fov: Float
+    ) {
+        object Builder {
+            private var isPerspective = false
+            private var zNear = -1000f
+            private var zFar = 1000f
+            private var fov = 60f
+
+            fun isPerspective(isPerspective: Boolean) =
+                this.apply { this.isPerspective = isPerspective }
+
+            fun zArguments(zNear: Float, zFar: Float) = this.apply {
+                this.zNear = zNear
+                this.zFar = zFar
+            }
+
+            fun ratio(ratio: Float) = this.also { this.fov = ratio }
+
+            fun build() = CameraSettings(isPerspective, zNear, zFar, fov)
+        }
+
+        companion object {
+            val DEFAULT = Builder.build()
+        }
     }
 }

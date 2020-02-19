@@ -20,32 +20,26 @@ class VaoBinder(
     private fun bindMesh(mesh: Mesh) {
         val index = mesh.uniqueIndex
 
-        val vao = vaoStore.get(index)
+        val vao = vaoStore.newInstance(index)
         GL30.glBindVertexArray(vao)
 
-        val verticesVbo = vboStore.get(Vbo.elementsVbo(index))
+        val verticesVbo = vboStore.newInstance(Vbo.elementsVbo(index))
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, verticesVbo)
 
         GL30.glBufferData(GL30.GL_ARRAY_BUFFER, mesh.vertices, GL30.GL_STATIC_DRAW)
         GL30.glVertexAttribPointer(0, Vector3.COMPONENTS, GL_FLOAT, false, 0, 0L)
 
-        val texCoordinatesVbo = vboStore.get(Vbo.elementsVbo(index))
+        val texCoordinatesVbo = vboStore.newInstance(Vbo.elementsVbo(index))
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, texCoordinatesVbo)
 
         GL30.glBufferData(GL30.GL_ARRAY_BUFFER, mesh.texCoordinates, GL30.GL_STATIC_DRAW)
         GL30.glVertexAttribPointer(1, Vector3.COMPONENTS, GL_FLOAT, false, 0, 0L)
 
-        val normalsVbo = vboStore.get(Vbo.elementsVbo(index))
+        val normalsVbo = vboStore.newInstance(Vbo.elementsVbo(index))
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, normalsVbo)
 
         GL30.glBufferData(GL30.GL_ARRAY_BUFFER, mesh.normals, GL30.GL_STATIC_DRAW)
         GL30.glVertexAttribPointer(2, Vector3.COMPONENTS, GL_FLOAT, false, 0, 0L)
-
-        if (mesh.isOptimized) {
-            val elementBuffer = vboStore.get(Vbo.elementsVbo(index))
-            GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, elementBuffer)
-            GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, mesh.elements, GL30.GL_STATIC_DRAW)
-        }
 
         GL30.glBindVertexArray(NO_VERTEX_ARRAY)
     }

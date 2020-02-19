@@ -15,6 +15,16 @@ interface FileProvider {
     fun createFile(fileName: String, content: String): Boolean
 
     fun createFile(fileName: String, content: ByteArray): Boolean
+
+    companion object {
+        fun get(): FileProvider {
+            return when {
+                ResourcesFileProvider.available -> ResourcesFileProvider
+                ExternalStorageFileProvider.available -> ExternalStorageFileProvider
+                else -> throw IllegalStateException("No file provider available, check security permission, or restart app as admin")
+            }
+        }
+    }
 }
 
 object ExternalStorageFileProvider : FileProvider {
