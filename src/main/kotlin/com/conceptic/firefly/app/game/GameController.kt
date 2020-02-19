@@ -1,4 +1,4 @@
-package com.conceptic.firefly.app
+package com.conceptic.firefly.app.game
 
 import com.conceptic.firefly.app.menu.MenuController
 import com.conceptic.firefly.log.Logger

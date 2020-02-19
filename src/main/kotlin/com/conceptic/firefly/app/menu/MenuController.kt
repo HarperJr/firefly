@@ -23,7 +23,7 @@ class MenuController {
         .isPerspective(false)
         .build()
     private val camera = Camera(cameraSettings)
-    private val viewRenderer = ViewRenderer(ViewShaderResolver, VaoStore.get(), VboStore.get())
+    private val viewRenderer = ViewRenderer(ViewShaderResolver)
 
     private val buttons = mutableListOf<Button>()
 

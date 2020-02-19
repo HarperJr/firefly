@@ -14,7 +14,7 @@ class Mesh private constructor(
     override val name: String,
     override val vertices: FloatBuffer,
     override val texCoordinates: FloatBuffer,
-    override val elements: IntBuffer,
+    val elements: IntBuffer,
     val normals: FloatBuffer,
     val material: MeshMaterial
 ) : Renderable() {

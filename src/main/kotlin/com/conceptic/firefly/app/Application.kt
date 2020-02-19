@@ -1,5 +1,6 @@
 package com.conceptic.firefly.app
 
+import com.conceptic.firefly.app.game.GameController
 import com.conceptic.firefly.di.applicationModule
 import com.conceptic.firefly.log.Logger
 import com.conceptic.firefly.screen.ScreenController
