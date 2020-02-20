@@ -26,7 +26,11 @@ class ViewRenderer(
             uniformMat4(Shader.U_MODEL_VIEW_MATRIX, MatrixStackHolder.modelViewMatrixAsBuffer)
             uniformVec4(ViewShader.U_COLOR, renderable.color)
 
-            GL20.glDrawArrays(GL11.GL_TRIANGLE_FAN, 0, renderable.verticesCount)
+            GL20.glEnableVertexAttribArray(ViewShader.A_POSITION)
+
+            GL20.glDrawArrays(GL11.GL_TRIANGLE_FAN, 0, 4)
+
+            GL20.glDisableVertexAttribArray(ViewShader.A_POSITION)
 
             GL30.glBindVertexArray(NO_VERTEX_ARRAY)
         }

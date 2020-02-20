@@ -2,6 +2,7 @@ package com.conceptic.firefly.app.gl.renderable.mesh.material
 
 import com.conceptic.firefly.app.gl.renderer.Material
 import com.conceptic.firefly.app.gl.support.Vector3
+import com.conceptic.firefly.app.gl.support.Vector4
 import com.conceptic.firefly.app.gl.texture.Texture
 
 /**
@@ -9,25 +10,21 @@ import com.conceptic.firefly.app.gl.texture.Texture
  */
 data class MeshMaterial(
     override val name: String,
-    val dissolveFactor: Float,
-    val specularFactor: Float,
-    val ambient: Vector3,
-    val diffuse: Vector3,
-    val specular: Vector3,
-    val emissive: Vector3,
+    val ambient: Vector4,
+    val diffuse: Vector4,
+    val specular: Vector4,
+    val emissive: Vector4,
     val texAmbient: Texture,
     val texDiffuse: Texture,
     val texSpecular: Texture
-): Material {
+) : Material {
     companion object {
         val EMPTY = MeshMaterial(
             "Empty",
-            0f,
-            0f,
-            Vector3.ZERO,
-            Vector3.ZERO,
-            Vector3.ZERO,
-            Vector3.ZERO,
+            Vector4.ZERO,
+            Vector4.ZERO,
+            Vector4.ZERO,
+            Vector4.ZERO,
             Texture.NONE,
             Texture.NONE,
             Texture.NONE

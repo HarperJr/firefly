@@ -61,17 +61,27 @@ class ViewDataBinder(
         val verticesVbo = vboStore.newInstance(Vbo.vertexVbo(viewKey))
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, verticesVbo)
         GL30.glBufferData(GL30.GL_ARRAY_BUFFER, view.vertices, GL30.GL_STATIC_DRAW)
-        GL30.glVertexAttribPointer(ViewShader.A_POSITION, Vector3.COMPONENTS, GL_FLOAT, false, Vector3.COMPONENTS * 4, 0L)
-
-        GL20.glEnableVertexAttribArray(ViewShader.A_POSITION)
+        GL30.glVertexAttribPointer(
+            ViewShader.A_POSITION,
+            Vector3.COMPONENTS,
+            GL_FLOAT,
+            false,
+            Vector3.COMPONENTS * 4,
+            0L
+        )
 
         if (view.hasTexture) {
             val texCoordinatesVbo = vboStore.newInstance(Vbo.texCoordinatesVbo(viewKey))
             GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, texCoordinatesVbo)
             GL30.glBufferData(GL30.GL_ARRAY_BUFFER, view.texCoordinates, GL30.GL_STATIC_DRAW)
-            GL30.glVertexAttribPointer(ViewShader.A_TEX_COORD, Vector2.COMPONENTS, GL_FLOAT, false, Vector2.COMPONENTS * 4, 0L)
-
-            GL20.glEnableVertexAttribArray(ViewShader.A_TEX_COORD)
+            GL30.glVertexAttribPointer(
+                ViewShader.A_TEX_COORD,
+                Vector2.COMPONENTS,
+                GL_FLOAT,
+                false,
+                Vector2.COMPONENTS * 4,
+                0L
+            )
         }
     }
 }

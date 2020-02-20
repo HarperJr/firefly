@@ -11,7 +11,7 @@ out FragParams {
     vec2 texCoords;
     vec3 normal;
     vec3 look;
-} frag;
+} fragParams;
 
 vec4 worldPosition(in vec3 position) {
     return modelViewMatrix * vec4(position, 1.0);
@@ -20,9 +20,9 @@ vec4 worldPosition(in vec3 position) {
 void main() {
     vec4 worldPosition = worldPosition(position);
 
-    frag.texCoords = texCoord;
-    frag.normal = normal;
-    frag.look = normalize(worldPosition - inverse(modelViewMatrix[3])).xyz;
+    fragParams.texCoords = texCoord;
+    fragParams.normal = normal;
+    fragParams.look = normalize(worldPosition - modelViewMatrix[3]).xyz;
 
     gl_Position = projectionMatrix * worldPosition;
 }

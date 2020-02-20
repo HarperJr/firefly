@@ -1,12 +1,10 @@
 #version 440
 
 struct Material {
-    float dissolveFactor;
-    float specularFactor;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    vec3 emissive;
+    vec4 ambient;
+    vec4 diffuse;
+    vec4 specular;
+    vec4 emissive;
     sampler2D texAmbient;
     sampler2D texDiffuse;
     sampler2D texSpecular;
@@ -18,11 +16,11 @@ in FragParams {
     vec2 texCoords;
     vec3 normal;
     vec3 look;
-} frag;
+} fragParams;
 
 out vec4 outColor;
 
 void main() {
-    vec4 ambientColor = texture(material.texAmbient, params.texCoords) * material.ambient;
-    outColor = vec4(ambientColor.rgb, material.dissolveFactor);
+    vec4 ambientColor = texture(material.texAmbient, fragParams.texCoords) * material.ambient;
+    outColor = ambientColor;
 }

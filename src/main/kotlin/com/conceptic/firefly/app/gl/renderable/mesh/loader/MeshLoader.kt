@@ -3,14 +3,15 @@ package com.conceptic.firefly.app.gl.renderable.mesh.loader
 import com.conceptic.firefly.app.gl.renderable.mesh.Mesh
 import com.conceptic.firefly.app.gl.renderable.mesh.material.MeshMaterial
 import com.conceptic.firefly.app.gl.support.Vector4
+import com.conceptic.firefly.app.gl.texture.Texture
 import com.conceptic.firefly.app.gl.texture.TextureLoader
 import com.conceptic.firefly.app.gl.texture.TextureStore
 import com.conceptic.firefly.utils.FileProvider
+import org.lwjgl.BufferUtils
 import org.lwjgl.assimp.*
-import java.nio.ByteBuffer
+import org.lwjgl.system.MemoryUtil
 import java.nio.FloatBuffer
 import java.nio.IntBuffer
-import java.nio.file.Paths
 
 
 class MeshContentProvider private constructor(private val fileProvider: FileProvider) {
@@ -36,15 +37,21 @@ class MeshLoader(
     fun load(meshFileName: String): List<Mesh> {
         val contentProvider = MeshContentProvider.fromFileProvider(fileProvider)
         val meshContent = contentProvider.provide(meshFileName)
-        val importScene = Assimp.aiImportFile(
-            ByteBuffer.wrap(meshContent),
-            Assimp.aiProcess_OptimizeMeshes or Assimp.aiProcess_FlipUVs or Assimp.aiProcess_JoinIdenticalVertices
+
+        val byteBuffer = MemoryUtil.memCalloc(meshContent.size)
+        byteBuffer.put(meshContent)
+        byteBuffer.flip()
+
+        val importScene = Assimp.aiImportFileFromMemory(
+            byteBuffer,
+            Assimp.aiProcess_OptimizeMeshes or Assimp.aiProcess_FlipUVs or Assimp.aiProcess_JoinIdenticalVertices,
+            BufferUtils.createByteBuffer(1)
         )
 
         return importScene?.let { scene ->
             val materials = loadRawMaterials(scene)
             loadRawSubMeshes(scene, materials)
-        } ?: throw IllegalArgumentException("Unable to load mesh: $meshFileName")
+        } ?: throw IllegalArgumentException("Unable to load mesh $meshFileName in cause: ${Assimp.aiGetErrorString()}")
     }
 
     private fun loadRawSubMeshes(scene: AIScene, meshMaterials: List<MeshMaterial>): List<Mesh> {
@@ -123,15 +130,13 @@ class MeshLoader(
 
                 MeshMaterial(
                     name = name,
-                    dissolveFactor = ambient.w,
-                    specularFactor = specular.w,
-                    ambient = ambient.toVector3(),
-                    diffuse = diffuse.toVector3(),
-                    emissive = emissive.toVector3(),
-                    specular = specular.toVector3(),
-                    texAmbient = textureLoader.load(texAmbient),
-                    texDiffuse = textureLoader.load(texDiffuse),
-                    texSpecular = textureLoader.load(texSpecular)
+                    ambient = ambient,
+                    diffuse = diffuse,
+                    emissive = emissive,
+                    specular = specular,
+                    texAmbient = texAmbient,
+                    texDiffuse = texDiffuse,
+                    texSpecular = texSpecular
                 )
             }
         } else emptyList()
@@ -142,9 +147,15 @@ class MeshLoader(
         if (result == 0) Vector4(this.r(), this.g(), this.b(), this.a()) else Vector4.IDENTITY
     }
 
-    private fun getTexture(material: AIMaterial, type: Int) = with(AIString.calloc()) {
-        Assimp.aiGetMaterialTexture(material, type, 0, this, null as IntBuffer?, null, null, null, null, null)
-        this.dataString()
+    private fun getTexture(material: AIMaterial, type: Int): Texture {
+        val textureFileName = with(AIString.calloc()) {
+            Assimp.aiGetMaterialTexture(material, type, 0, this, null as IntBuffer?, null, null, null, null, null)
+            this.dataString()
+        }
+
+        return if (textureFileName.isNotEmpty()) {
+            textureLoader.load(textureFileName)
+        } else Texture.NONE
     }
 
     companion object {

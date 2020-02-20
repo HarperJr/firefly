@@ -7,6 +7,7 @@ import com.conceptic.firefly.app.screen.listener.ScreenActionsListener
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
+import org.lwjgl.opengl.GL11.GL_TRUE
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.system.MemoryUtil.NULL
 
@@ -37,6 +38,7 @@ class GLFWScreen(
         glfwDefaultWindowHints()
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE)
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE)
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE)
 
         this.window = glfwCreateWindow(width, height, title, NULL, NULL)
 

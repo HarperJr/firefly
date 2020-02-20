@@ -1,11 +1,15 @@
 package com.conceptic.firefly.app.menu
 
 import com.conceptic.firefly.app.camera.Camera
+import com.conceptic.firefly.app.gl.renderable.mesh.Mesh
+import com.conceptic.firefly.app.gl.renderable.mesh.loader.MeshLoader
 import com.conceptic.firefly.app.gl.renderable.view.View
 import com.conceptic.firefly.app.gl.renderable.view.button.Button
+import com.conceptic.firefly.app.gl.renderer.mesh.MeshRenderer
 import com.conceptic.firefly.app.gl.renderer.view.ViewRenderer
 import com.conceptic.firefly.app.gl.shader.Shader
 import com.conceptic.firefly.app.gl.shader.ShaderStore
+import com.conceptic.firefly.app.gl.shader.definition.MeshShaderDefinition
 import com.conceptic.firefly.app.gl.shader.definition.ViewShaderDefinition
 import com.conceptic.firefly.app.gl.shader.loader.ShaderLoader
 import com.conceptic.firefly.app.gl.shader.resolver.ShaderResolver
@@ -30,6 +34,10 @@ class MenuController {
     private val viewRenderer = ViewRenderer(ViewShaderResolver)
     private val buttons = mutableListOf<Button>()
 
+    private val meshLoader = MeshLoader(FileProvider.get())
+    private val meshRenderer = MeshRenderer(MeshShaderResolver)
+    private val meshList = mutableListOf<Mesh>()
+
     private var screenWidth = 0
     private var screenHeight = 0
 
@@ -40,6 +48,11 @@ class MenuController {
         GL11.glViewport(0, 0, width, height)
 
         inflateButtons()
+
+        val meshes = meshLoader.load("elementalist/Elementalist.obj")
+        for (mesh in meshes)
+            DataBinder.bind(mesh)
+        meshList.addAll(meshes)
     }
 
     fun onSizeChanged(width: Int, height: Int) {
@@ -53,6 +66,10 @@ class MenuController {
         MatrixStackHolder.pushMatrix()
         for (button in buttons)
             viewRenderer.render(button)
+
+        for (mesh in meshList)
+            meshRenderer.render(mesh)
+
         MatrixStackHolder.popMatrix()
     }
 
@@ -69,7 +86,7 @@ class MenuController {
     private fun inflateButtons() {
         val playTheGameButton = Button(
             "PLAY THE GAME",
-            Bounds(0f, 0f, screenWidth.toFloat(), screenHeight.toFloat()),
+            Bounds(0f, screenHeight.toFloat(), screenWidth.toFloat(), 0f),
             Vector4(0.5f, 0.3f, 0.6f, 1.0f),
             Texture.NONE
         )
@@ -83,6 +100,15 @@ class MenuController {
     private val onPlayBtnClickListener = object : View.OnClickListener {
         override fun onClick(view: View) {
             logger.debug("On button clicked")
+        }
+    }
+
+    object MeshShaderResolver : ShaderResolver<Mesh> {
+        private val shaderLoader = ShaderLoader(FileProvider.get(), ShaderStore.get())
+        private val meshShader: Shader by lazy { shaderLoader.load(MeshShaderDefinition) }
+
+        override fun resolve(renderable: Mesh): Shader {
+            return meshShader
         }
     }
 

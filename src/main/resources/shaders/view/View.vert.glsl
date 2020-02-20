@@ -16,5 +16,5 @@ vec4 screenPosition(in vec3 position) {
 
 void main() {
     fragParams.texCoord = texCoord;
-    gl_Position = projectionMatrix * screenPosition(position);
+    gl_Position = vec4(position, 1.0);
 }
