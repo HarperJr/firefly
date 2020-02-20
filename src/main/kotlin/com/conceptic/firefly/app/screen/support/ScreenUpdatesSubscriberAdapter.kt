@@ -1,4 +1,4 @@
-package com.conceptic.firefly.screen.support
+package com.conceptic.firefly.app.screen.support
 
 open class ScreenUpdatesSubscriberAdapter : ScreenUpdatesSubscriber {
     override fun onInit() {}

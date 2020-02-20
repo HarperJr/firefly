@@ -1,9 +1,9 @@
-package com.conceptic.firefly.screen
+package com.conceptic.firefly.app.screen
 
 import com.conceptic.firefly.log.Logger
-import com.conceptic.firefly.screen.listener.KeyActionListener
-import com.conceptic.firefly.screen.listener.MouseActionListener
-import com.conceptic.firefly.screen.listener.ScreenActionListener
+import com.conceptic.firefly.app.screen.listener.KeyActionsListener
+import com.conceptic.firefly.app.screen.listener.MouseActionsListener
+import com.conceptic.firefly.app.screen.listener.ScreenActionsListener
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
@@ -11,13 +11,13 @@ import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.system.MemoryUtil.NULL
 
 class GLFWScreen(
-    title: String,
     screenWidth: Int,
     screenHeight: Int,
+    private val title: String,
     private val fullScreen: Boolean,
-    private val keyActionListener: KeyActionListener,
-    private val screenActionListener: ScreenActionListener,
-    private val mouseActionListener: MouseActionListener
+    private val keyActionsListener: KeyActionsListener,
+    private val screenActionListener: ScreenActionsListener,
+    private val mouseActionsListener: MouseActionsListener
 ) {
     private val logger = Logger.getLogger<GLFWScreen>()
     private var window: Long = NULL
@@ -30,7 +30,7 @@ class GLFWScreen(
     var lastCursorXPos: Int = -1
     var lastCursorYPost: Int = -1
 
-    init {
+    fun init() {
         GLFWErrorCallback.createPrint(System.err)
         if (!glfwInit()) throw IllegalStateException("Unable to bindUniformLocations GLFW")
 
@@ -46,24 +46,24 @@ class GLFWScreen(
         glfwSetKeyCallback(window) { _, keyCode, _, actionCode, _ ->
             val key = Key.fromGlfw(keyCode)
             when (actionCode) {
-                GLFW_PRESS -> keyActionListener.onPressed(key)
-                GLFW_RELEASE -> keyActionListener.onReleased(key)
+                GLFW_PRESS -> keyActionsListener.onPressed(key)
+                GLFW_RELEASE -> keyActionsListener.onReleased(key)
             }
         }
 
         glfwSetCursorPosCallback(window) { _, x, y ->
             this.lastCursorXPos = x.toInt()
             this.lastCursorYPost = y.toInt()
-            mouseActionListener.onMoved(this.lastCursorXPos, this.lastCursorYPost)
+            mouseActionsListener.onMoved(this.lastCursorXPos, this.lastCursorYPost)
         }
 
         glfwSetMouseButtonCallback(window) { _, button, action, _ ->
             when (action) {
                 GLFW_RELEASE ->
                     if (button == GLFW_MOUSE_BUTTON_LEFT)
-                        mouseActionListener.onClicked(this.lastCursorXPos, this.lastCursorYPost)
+                        mouseActionsListener.onClicked(this.lastCursorXPos, this.lastCursorYPost)
                 GLFW_REPEAT -> if (button == GLFW_MOUSE_BUTTON_LEFT)
-                    mouseActionListener.onDoubleClicked(this.lastCursorXPos, this.lastCursorYPost)
+                    mouseActionsListener.onDoubleClicked(this.lastCursorXPos, this.lastCursorYPost)
             }
         }
 

@@ -1,22 +1,21 @@
 package com.conceptic.firefly.app.game
 
+import com.conceptic.firefly.Publishers
 import com.conceptic.firefly.app.menu.MenuController
 import com.conceptic.firefly.log.Logger
-import com.conceptic.firefly.screen.Key
-import com.conceptic.firefly.screen.support.*
-import org.lwjgl.opengl.GL
-import org.lwjgl.opengl.GL11
+import com.conceptic.firefly.app.screen.Key
+import com.conceptic.firefly.app.screen.support.*
 import org.lwjgl.opengl.GL11.*
 
 class GameController(
-    private val screenUpdatesPublisher: ScreenUpdatesPublisher,
-    private val mouseActionsPublisher: MouseActionsPublisher,
-    private val keyActionsPublisher: KeyActionsPublisher
+    publishers: Publishers
 ) : ScreenUpdatesSubscriberAdapter(), KeyActionsSubscriber, MouseActionsSubscriber {
     private val logger = Logger.getLogger<GameController>()
 
-    private var screenWidth: Int = 0
-    private var screenHeight: Int = 0
+    private val screenUpdatesPublisher = publishers.screenUpdatesPublisher
+    private val mouseActionsPublisher = publishers.mouseUpdatesPublisher
+    private val keyActionsPublisher = publishers.keyActionsPublisher
+
     private var isInMainMenu = true
 
     private val menuController: MenuController = MenuController()
@@ -28,26 +27,18 @@ class GameController(
     }
 
     override fun onShow(width: Int, height: Int) {
-        screenWidth = width
-        screenHeight = height
-
-        glViewport(0, screenWidth, screenHeight, 0)
-
-        menuController.onShow(screenWidth, screenHeight)
+        menuController.onShow(width, height)
     }
 
     override fun onSizeChanged(width: Int, height: Int) {
-        screenWidth = width
-        screenHeight = height
-
-        glViewport(0, screenWidth, screenHeight, 0)
+        menuController.onSizeChanged(width, height)
     }
 
     override fun onUpdate() {
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
         // Render something here
         if (isInMainMenu)
-            menuController.onUpdate(screenWidth, screenHeight)
+            menuController.onUpdate()
     }
 
     override fun onDestroy() {

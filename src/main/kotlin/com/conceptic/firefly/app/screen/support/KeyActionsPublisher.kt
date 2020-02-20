@@ -1,6 +1,6 @@
-package com.conceptic.firefly.screen.support
+package com.conceptic.firefly.app.screen.support
 
-import com.conceptic.firefly.screen.Key
+import com.conceptic.firefly.app.screen.Key
 import com.conceptic.firefly.support.Publisher
 
 interface KeyActionsSubscriber {

@@ -1,4 +1,4 @@
-package com.conceptic.firefly.screen
+package com.conceptic.firefly.app.screen
 
 import org.lwjgl.glfw.GLFW.GLFW_PRESS
 import org.lwjgl.glfw.GLFW.GLFW_RELEASE
