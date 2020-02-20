@@ -1,12 +1,17 @@
 package com.conceptic.firefly.app
 
 import com.conceptic.firefly.app.game.GameController
+import com.conceptic.firefly.app.gl.texture.TextureStore
+import com.conceptic.firefly.app.gl.vao.VaoStore
+import com.conceptic.firefly.app.gl.vbo.VboStore
 import com.conceptic.firefly.di.applicationModule
 import com.conceptic.firefly.log.Logger
 import com.conceptic.firefly.screen.ScreenController
 import org.koin.core.KoinComponent
 import org.koin.core.context.startKoin
 import org.koin.core.qualifier.named
+import org.lwjgl.opengl.GL
+import org.lwjgl.opengl.GL11
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -24,6 +29,12 @@ class Application(
 
     fun run() {
         screenController.init()
+
+        GL.createCapabilities()
+        GL11.glClearColor(0.4f, 0.8f, 0.9f, 1.0f)
+        GL11.glEnable(GL11.GL_TEXTURE_2D)
+        //GL11.glEnable(GL11.GL_DEPTH_TEST)
+
         gameController.init()
 
         needsUpdates.set(true)
@@ -35,15 +46,16 @@ class Application(
                 screenController.update()
                 needsUpdates.set(screenController.isActive())
             }
-        }.onSuccess { shutdown() }
-            .onFailure {
-                shutdown()
-                logger.error(it)
-            }
+        }.onFailure {
+            logger.error(it)
+        }
+
+        shutdown()
     }
 
     private fun shutdown() {
         logger.info("Shutting down")
+
         fixedUpdatesExecutor.shutdown()
         screenController.destroy()
     }

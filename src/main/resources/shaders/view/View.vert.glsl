@@ -4,12 +4,10 @@ uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 
 layout(location = 0) in vec3 position;
-layout(location = 2) in vec2 texCoords;
-layout(location = 3) in vec4 color;
+layout(location = 1) in vec2 texCoord;
 
 out FragParams {
-    vec2 texCoords;
-    vec4 color;
+    vec2 texCoord;
 } fragParams;
 
 vec4 screenPosition(in vec3 position) {
@@ -17,8 +15,6 @@ vec4 screenPosition(in vec3 position) {
 }
 
 void main() {
-    fragParams.texCoords = texCoords;
-    fragParams.color = color;
-
+    fragParams.texCoord = texCoord;
     gl_Position = projectionMatrix * screenPosition(position);
 }

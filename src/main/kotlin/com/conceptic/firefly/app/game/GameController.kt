@@ -25,13 +25,6 @@ class GameController(
         screenUpdatesPublisher.subscribe(this)
         mouseActionsPublisher.subscribe(this)
         keyActionsPublisher.subscribe(this)
-
-        GL.createCapabilities()
-
-        GL11.glClearColor(0.4f, 0.2f, 0.2f, 1.0f)
-
-        GL11.glEnable(GL11.GL_TEXTURE_2D)
-        GL11.glEnable(GL11.GL_DEPTH_TEST)
     }
 
     override fun onShow(width: Int, height: Int) {

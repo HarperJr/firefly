@@ -38,6 +38,7 @@ class Vector4(xCoord: Float, yCoord: Float, zCoord: Float, wCoord: Float) {
     }
 
     companion object {
+        const val COMPONENTS = 4
         val ZERO = Vector4(0f, 0f, 0f, 0f)
         val IDENTITY = Vector4(1f, 1f, 1f, 1f)
     }

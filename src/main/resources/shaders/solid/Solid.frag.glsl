@@ -14,7 +14,12 @@ struct Material {
 
 uniform Material material;
 
-in FragParams params;
+in FragParams {
+    vec2 texCoords;
+    vec3 normal;
+    vec3 look;
+} frag;
+
 out vec4 outColor;
 
 void main() {

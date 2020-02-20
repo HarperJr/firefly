@@ -37,8 +37,8 @@ class Vector3(xCoord: Float, yCoord: Float, zCoord: Float) {
     }
 
     companion object {
+        const val COMPONENTS = 3
         val ZERO = Vector3(0f, 0f, 0f)
         val IDENTITY = Vector3(1f, 1f, 1f)
-        val COMPONENTS = 3
     }
 }

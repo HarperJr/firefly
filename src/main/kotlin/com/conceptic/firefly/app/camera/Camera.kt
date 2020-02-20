@@ -1,8 +1,7 @@
 package com.conceptic.firefly.app.camera
 
 import com.conceptic.firefly.app.gl.support.Vector3
-import com.conceptic.firefly.utils.MatrixUtils
-import org.lwjgl.opengl.GL11.*
+import com.conceptic.firefly.utils.MatrixStackHolder
 
 class Camera(private val cameraSettings: CameraSettings) {
     private var position = Vector3.ZERO
@@ -12,17 +11,12 @@ class Camera(private val cameraSettings: CameraSettings) {
     }
 
     fun update(width: Int, height: Int) {
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-
         if (cameraSettings.isPerspective) {
             val aspect = if (height != 0) width.toFloat() / height.toFloat() else 0f
-            MatrixUtils.setPerspective(cameraSettings.fov, aspect, cameraSettings.zNear, cameraSettings.zFar)
-        } else MatrixUtils.setOrtho(0f, width.toFloat(), height.toFloat(), 0f, cameraSettings.zNear, cameraSettings.zFar)
+            MatrixStackHolder.setPerspective(cameraSettings.fov, aspect, cameraSettings.zNear, cameraSettings.zFar)
+        } else MatrixStackHolder.setOrtho(0f, width.toFloat(), 0f, height.toFloat(), cameraSettings.zNear, cameraSettings.zFar)
 
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
-        glTranslatef(position.x, position.y, position.z)
+        MatrixStackHolder.translate(position.x, position.y, position.z)
     }
 
     class CameraSettings private constructor(
@@ -45,7 +39,7 @@ class Camera(private val cameraSettings: CameraSettings) {
                 this.zFar = zFar
             }
 
-            fun ratio(ratio: Float) = this.also { this.fov = ratio }
+            fun fov(fov: Float) = this.also { this.fov = fov }
 
             fun build() = CameraSettings(isPerspective, zNear, zFar, fov)
         }

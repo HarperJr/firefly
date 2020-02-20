@@ -4,6 +4,7 @@ import com.conceptic.firefly.app.gl.renderable.mesh.Mesh
 import com.conceptic.firefly.app.gl.renderable.mesh.material.MeshMaterial
 import com.conceptic.firefly.app.gl.support.Vector4
 import com.conceptic.firefly.app.gl.texture.TextureLoader
+import com.conceptic.firefly.app.gl.texture.TextureStore
 import com.conceptic.firefly.utils.FileProvider
 import org.lwjgl.assimp.*
 import java.nio.ByteBuffer
@@ -14,7 +15,7 @@ import java.nio.file.Paths
 
 class MeshContentProvider private constructor(private val fileProvider: FileProvider) {
     fun provide(meshFileName: String): ByteArray =
-        fileProvider.provideFileContent(Paths.get(MESH_DIR, meshFileName).toString())
+        fileProvider.provideFileContent(MESH_DIR + meshFileName)
 
     companion object {
         private const val MESH_DIR = "meshes/"
@@ -28,10 +29,12 @@ class MeshContentProvider private constructor(private val fileProvider: FileProv
  * This is possibly would lead to a very long time routine process, should be executed at separated thread
  */
 class MeshLoader(
-    private val contentProvider: MeshContentProvider,
-    private val textureLoader: TextureLoader
+    private val fileProvider: FileProvider
 ) {
+    private val textureLoader: TextureLoader = TextureLoader(fileProvider, TextureStore.get())
+
     fun load(meshFileName: String): List<Mesh> {
+        val contentProvider = MeshContentProvider.fromFileProvider(fileProvider)
         val meshContent = contentProvider.provide(meshFileName)
         val importScene = Assimp.aiImportFile(
             ByteBuffer.wrap(meshContent),

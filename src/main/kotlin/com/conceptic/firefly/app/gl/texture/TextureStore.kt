@@ -1,6 +1,7 @@
 package com.conceptic.firefly.app.gl.texture
 
 import com.conceptic.firefly.app.gl.store.Store
+import com.conceptic.firefly.app.gl.vbo.VboStore
 import org.lwjgl.opengl.GL11
 
 class TextureStore : Store<String, Texture>() {
@@ -10,4 +11,16 @@ class TextureStore : Store<String, Texture>() {
     }
 
     override fun create(key: String): Texture = Texture(key, GL11.glGenTextures())
+
+    companion object {
+        private var instance: TextureStore? = null
+
+        fun get(): TextureStore {
+            return synchronized(this) {
+                if (instance == null)
+                    instance = TextureStore()
+                instance!!
+            }
+        }
+    }
 }

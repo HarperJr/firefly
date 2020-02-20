@@ -23,16 +23,14 @@ class ShaderLoader(fileProvider: FileProvider, private val shaderStore: ShaderSt
 
     fun load(shaderDefinition: ShaderDefinition): Shader {
         if (shaderStore.contains(shaderDefinition))
-            return shaderStore[shaderDefinition]!!
+            return shaderStore[shaderDefinition]
         val shader = shaderStore.newInstance(shaderDefinition)
         return kotlin.runCatching {
-            val shaderScripts = shaderDefinition.scripts.map { shaderScript ->
+            shaderDefinition.scripts.map { shaderScript ->
                 val shaderScriptContent = contentProvider.provide(shaderDefinition.sourceFolder + shaderScript.name)
                 createShader(shaderScript.glShaderType, String(shaderScriptContent))
                     .also { shader.attach(it) }
             }
-
-            shaderScripts.forEach { GL20.glDeleteShader(it) }
             return@runCatching shader
         }.onSuccess { shader.link() }
             .getOrThrow()

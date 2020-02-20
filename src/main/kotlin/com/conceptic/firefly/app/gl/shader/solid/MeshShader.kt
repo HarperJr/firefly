@@ -15,16 +15,26 @@ class MeshShader(shaderProgram: Int) : Shader(shaderProgram) {
         U_TEX_SPECULAR
     )
 
+    override fun bindAttributes() {
+        attributeLocation(A_POSITION, "position")
+        attributeLocation(A_TEX_COORD, "texCoord")
+        attributeLocation(A_NORMALS, "normal")
+    }
+
     companion object {
-        private const val U_DISSOLVE_FACTOR = "material.dissolveFactor"
-        private const val U_SPECULAR_FACTOR = "material.specularFactor"
-        private const val U_AMBIENT = "material.ambient"
-        private const val U_DIFFUSE = "material.diffuse"
-        private const val U_SPECULAR = "material.specular"
-        private const val U_EMISSIVE = "material.emissive"
-        private const val U_TEX_AMBIENT = "material.texAmbient"
-        private const val U_TEX_DIFFUSE = "material.texDiffuse"
-        private const val U_TEX_SPECULAR = "material.texSpecular"
+        const val A_POSITION = 0
+        const val A_TEX_COORD = 1
+        const val A_NORMALS = 2
+        // Uniforms
+        const val U_DISSOLVE_FACTOR = "material.dissolveFactor"
+        const val U_SPECULAR_FACTOR = "material.specularFactor"
+        const val U_AMBIENT = "material.ambient"
+        const val U_DIFFUSE = "material.diffuse"
+        const val U_SPECULAR = "material.specular"
+        const val U_EMISSIVE = "material.emissive"
+        const val U_TEX_AMBIENT = "material.texAmbient"
+        const val U_TEX_DIFFUSE = "material.texDiffuse"
+        const val U_TEX_SPECULAR = "material.texSpecular"
 
     }
 }

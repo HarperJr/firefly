@@ -2,7 +2,8 @@ package com.conceptic.firefly.app.gl.renderable.mesh
 
 import com.conceptic.firefly.app.gl.renderable.Renderable
 import com.conceptic.firefly.app.gl.renderable.mesh.material.MeshMaterial
-import com.conceptic.firefly.utils.Sha1
+import com.conceptic.firefly.app.gl.support.Vector3
+import com.conceptic.firefly.app.gl.texture.Texture
 import org.lwjgl.BufferUtils
 import java.nio.FloatBuffer
 import java.nio.IntBuffer
@@ -12,22 +13,28 @@ import java.nio.IntBuffer
  */
 class Mesh private constructor(
     override val name: String,
+    override val verticesCount: Int,
     override val vertices: FloatBuffer,
-    override val texCoordinates: FloatBuffer,
+    val texCoordinates: FloatBuffer,
     val elements: IntBuffer,
     val normals: FloatBuffer,
     val material: MeshMaterial
 ) : Renderable() {
-    val uniqueIndex = Sha1.encode(name)
+    val hasTexture: Boolean
+        get() = material.texAmbient != Texture.NONE
 
     class Builder(private val name: String) {
+        private var verticesCount = 0
         private var vertices = BufferUtils.createFloatBuffer(0)
         private var texCoordinates = BufferUtils.createFloatBuffer(0)
         private var elements = BufferUtils.createIntBuffer(0)
         private var normals = BufferUtils.createFloatBuffer(0)
         private var material = MeshMaterial.EMPTY
 
-        fun setVertices(vertices: FloatBuffer) = this.apply { this.vertices = vertices }
+        fun setVertices(vertices: FloatBuffer) = this.apply {
+            this.verticesCount = vertices.capacity() / Vector3.COMPONENTS
+            this.vertices = vertices
+        }
 
         fun setTexCoordinates(texCoordinates: FloatBuffer) = this.apply { this.texCoordinates = texCoordinates }
 
@@ -37,6 +44,7 @@ class Mesh private constructor(
 
         fun build() = Mesh(
             name,
+            verticesCount,
             vertices,
             texCoordinates,
             elements,

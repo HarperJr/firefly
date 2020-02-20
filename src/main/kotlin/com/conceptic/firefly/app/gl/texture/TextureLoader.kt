@@ -17,10 +17,11 @@ class TextureContentProvider private constructor(private val fileProvider: FileP
 }
 
 class TextureLoader(
-    private val textureContentProvider: TextureContentProvider,
+    private val fileProvider: FileProvider,
     private val textureStore: TextureStore
 ) {
     fun load(textureFileName: String): Texture {
+        val textureContentProvider = TextureContentProvider.fromFileProvider(fileProvider)
         val textureImage = textureContentProvider.provide(textureFileName)
         val textureBuffer = textureImage.let { texture ->
             val pixelsArray = with(IntArray(size = texture.width * texture.height)) {

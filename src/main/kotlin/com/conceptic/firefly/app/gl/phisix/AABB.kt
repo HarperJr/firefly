@@ -12,7 +12,7 @@ class AABB(l: Float, t: Float, r: Float, b: Float) {
     var bottom: Float = b
         private set
 
-    fun move(vec: Vector2): AABB = this.apply {
+    fun translate(vec: Vector2): AABB = this.apply {
         left += vec.x
         top += vec.y
         right += vec.x

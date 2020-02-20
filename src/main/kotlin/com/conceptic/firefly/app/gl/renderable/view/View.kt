@@ -1,26 +1,46 @@
 package com.conceptic.firefly.app.gl.renderable.view
 
-import com.conceptic.firefly.app.gl.phisix.AABB
 import com.conceptic.firefly.app.gl.renderable.Renderable
+import com.conceptic.firefly.app.gl.support.Bounds
 import com.conceptic.firefly.app.gl.support.Vector2
+import com.conceptic.firefly.app.gl.support.Vector3
+import com.conceptic.firefly.app.gl.support.Vector4
 import com.conceptic.firefly.app.gl.texture.Texture
 import java.nio.FloatBuffer
-import java.nio.IntBuffer
 
 abstract class View(
     override val name: String,
-    left: Float, top: Float, right: Float, bottom: Float,
-    private val texture: Texture
+    private val bounds: Bounds,
+    val color: Vector4,
+    val texture: Texture
 ) : Renderable() {
-    override val vertices: FloatBuffer =
-        FloatBuffer.wrap(floatArrayOf(left, top, 0f, right, top, 0f, right, bottom, 0f, left, bottom, 0f))
-    override val texCoordinates: FloatBuffer =
-        FloatBuffer.wrap(floatArrayOf(0f, 1f, 1f, 1f, 1f, 0f, 0f, 0f))
+    val hasTexture: Boolean
+        get() = texture != Texture.NONE
 
-    val aabb = AABB(left, top, right, bottom)
+    override val verticesCount: Int
+        get() = vertices.capacity() / Vector3.COMPONENTS
+
+    override val vertices: FloatBuffer = FloatBuffer.wrap(
+        floatArrayOf(
+            bounds.left, bounds.top, 0f,
+            bounds.right, bounds.top, 0f,
+            bounds.right, bounds.bottom, 0f,
+            bounds.left, bounds.bottom, 0f
+        )
+    )
+
+    val texCoordinates: FloatBuffer = FloatBuffer.wrap(
+        floatArrayOf(0f, 1f, 1f, 1f, 1f, 0f, 0f, 0f)
+    )
 
     var onClickListener: View.OnClickListener? = null
     var isDirty: Boolean = false
+        private set
+
+    fun setPosition(vec: Vector2) {
+        bounds.translate(vec)
+        isDirty = true
+    }
 
     fun onClicked(x: Float, y: Float) {
 

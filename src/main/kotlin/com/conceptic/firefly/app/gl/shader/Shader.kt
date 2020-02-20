@@ -10,6 +10,8 @@ abstract class Shader(private val shaderProgram: Int) {
     protected abstract val uniforms: List<String>
     private val sharedUniforms = listOf(U_PROJECTION_MATRIX, U_MODEL_VIEW_MATRIX)
 
+    abstract fun bindAttributes()
+
     fun use(process: Shader.() -> Unit) {
         GL20.glUseProgram(shaderProgram)
         process.invoke(this)
@@ -21,16 +23,17 @@ abstract class Shader(private val shaderProgram: Int) {
     }
 
     fun link() {
-        bindUniformLocations()
-
-        GL20.glValidateProgram(shaderProgram)
         GL20.glLinkProgram(shaderProgram)
+        GL20.glValidateProgram(shaderProgram)
 
         if (GL20.glGetProgrami(shaderProgram, GL20.GL_LINK_STATUS) == GL11.GL_FALSE) {
             val info = GL20.glGetProgramInfoLog(shaderProgram, Int.MAX_VALUE)
             GL20.glDeleteProgram(shaderProgram)
             throw RuntimeException("Unable to link program $info")
         }
+
+        bindAttributes()
+        bindUniforms()
     }
 
     fun delete() {
@@ -51,12 +54,16 @@ abstract class Shader(private val shaderProgram: Int) {
 
     fun uniformMat4(uniform: String, mat4: FloatBuffer) = GL20.glUniformMatrix4fv(uniformLocation(uniform), false, mat4)
 
+    protected fun attributeLocation(attribute: Int, attributePointer: String) {
+        GL20.glBindAttribLocation(shaderProgram, attribute, attributePointer)
+    }
+
     private fun uniformLocation(uniform: String) = uniformLocations[uniform]
         ?: throw IllegalArgumentException("Unable to find uniform $uniform in shader")
 
     private val uniformLocations = mutableMapOf<String, Int>()
 
-    private fun bindUniformLocations() = this.apply {
+    private fun bindUniforms() = this.apply {
         val allUniforms = sharedUniforms.union(uniforms)
         allUniforms.forEach { uniform ->
             uniformLocations[uniform] = GL20.glGetUniformLocation(shaderProgram, uniform)

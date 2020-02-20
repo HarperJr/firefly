@@ -6,25 +6,27 @@ import java.nio.FloatBuffer
 import java.util.*
 
 
-object MatrixUtils {
+object MatrixStackHolder {
     private val matrixStack = ArrayDeque<Matrix4f>()
-    private val projectionMatrix = Matrix4f()
+
+    private val pMatrix = Matrix4f()
     private val identityMatrix = Matrix4f()
-    private val projectionMatrixBuffer = BufferUtils.createFloatBuffer(16)
-    private val modelViewMatrixBuffer = BufferUtils.createFloatBuffer(16)
+
+    private val pMatrixBuffer = BufferUtils.createFloatBuffer(16)
+    private val mvMatrixBuffer = BufferUtils.createFloatBuffer(16)
 
     val projectionMatrixAsBuffer: FloatBuffer
         get() {
-            projectionMatrixBuffer.clear()
-            return projectionMatrix.get(projectionMatrixBuffer)
+            pMatrixBuffer.clear()
+            return pMatrix.get(pMatrixBuffer)
         }
 
     val modelViewMatrixAsBuffer: FloatBuffer
         get() {
-            modelViewMatrixBuffer.clear()
+            mvMatrixBuffer.clear()
             var mat = identityMatrix
             if (!matrixStack.isEmpty()) mat = matrixStack.peek()
-            return mat.get(modelViewMatrixBuffer)
+            return mat.get(mvMatrixBuffer)
         }
 
     fun setPerspective(fov: Float, aspect: Float, near: Float, far: Float) {
@@ -32,13 +34,13 @@ object MatrixUtils {
         val yScale = ratio * aspect
         val frustum = far - near
 
-        projectionMatrix.zero()
+        pMatrix.zero()
 
-        projectionMatrix.m00(ratio)
-        projectionMatrix.m11(yScale)
-        projectionMatrix.m22(-(far + near) / frustum)
-        projectionMatrix.m23(-1f)
-        projectionMatrix.m32(-(2f * near * far) / frustum)
+        pMatrix.m00(ratio)
+        pMatrix.m11(yScale)
+        pMatrix.m22(-(far + near) / frustum)
+        pMatrix.m23(-1f)
+        pMatrix.m32(-(2f * near * far) / frustum)
     }
 
     fun setOrtho(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float) {
@@ -46,15 +48,15 @@ object MatrixUtils {
         val xScale = 2f / (top - bottom)
         val frustum = -2f / (far - near)
 
-        projectionMatrix.zero()
+        pMatrix.zero()
 
-        projectionMatrix.m00(xScale)
-        projectionMatrix.m11(yScale)
-        projectionMatrix.m22(frustum)
-        projectionMatrix.m30(-(right + left) / (right - left))
-        projectionMatrix.m31((top + bottom) / (top - bottom))
-        projectionMatrix.m32((far + near) / (far - near))
-        projectionMatrix.m33(1f)
+        pMatrix.m00(xScale)
+        pMatrix.m11(yScale)
+        pMatrix.m22(frustum)
+        pMatrix.m30(-(right + left) / (right - left))
+        pMatrix.m31((top + bottom) / (top - bottom))
+        pMatrix.m32((far + near) / (far - near))
+        pMatrix.m33(1f)
     }
 
     fun pushMatrix() {
@@ -62,8 +64,7 @@ object MatrixUtils {
         if (!matrixStack.isEmpty()) {
             mat.set(matrixStack.peek())
         }
-
-        addMatrixInStack(mat)
+        matrixStack.add(mat)
     }
 
     fun popMatrix() {
@@ -72,18 +73,20 @@ object MatrixUtils {
     }
 
     fun translate(i: Float, j: Float, k: Float) {
+        if (matrixStack.isEmpty())
+            matrixStack.add(identityMatrix)
         matrixStack.peek().translate(i, j, k)
     }
 
     fun rotate(a: Float, i: Float, j: Float, k: Float) {
+        if (matrixStack.isEmpty())
+            matrixStack.add(identityMatrix)
         matrixStack.peek().rotate(a, i, j, k)
     }
 
     fun scale(i: Float, j: Float, k: Float) {
+        if (matrixStack.isEmpty())
+            matrixStack.add(identityMatrix)
         matrixStack.peek().scale(i, j, k)
-    }
-
-    private fun addMatrixInStack(mat: Matrix4f) {
-        matrixStack.add(mat)
     }
 }

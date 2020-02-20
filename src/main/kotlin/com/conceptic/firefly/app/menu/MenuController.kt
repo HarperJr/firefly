@@ -1,30 +1,37 @@
 package com.conceptic.firefly.app.menu
 
 import com.conceptic.firefly.app.camera.Camera
+import com.conceptic.firefly.app.gl.renderable.mesh.Mesh
+import com.conceptic.firefly.app.gl.renderable.mesh.loader.MeshLoader
 import com.conceptic.firefly.app.gl.renderable.view.View
 import com.conceptic.firefly.app.gl.renderable.view.button.Button
+import com.conceptic.firefly.app.gl.renderer.mesh.MeshRenderer
 import com.conceptic.firefly.app.gl.renderer.view.ViewRenderer
 import com.conceptic.firefly.app.gl.shader.Shader
 import com.conceptic.firefly.app.gl.shader.ShaderStore
+import com.conceptic.firefly.app.gl.shader.definition.MeshShaderDefinition
 import com.conceptic.firefly.app.gl.shader.definition.ViewShaderDefinition
 import com.conceptic.firefly.app.gl.shader.loader.ShaderLoader
 import com.conceptic.firefly.app.gl.shader.resolver.ShaderResolver
+import com.conceptic.firefly.app.gl.support.Bounds
+import com.conceptic.firefly.app.gl.support.Vector3
+import com.conceptic.firefly.app.gl.support.Vector4
 import com.conceptic.firefly.app.gl.texture.Texture
-import com.conceptic.firefly.app.gl.vao.VaoStore
-import com.conceptic.firefly.app.gl.vbo.VboStore
+import com.conceptic.firefly.app.gl.vao.DataBinder
 import com.conceptic.firefly.log.Logger
 import com.conceptic.firefly.utils.FileProvider
+import com.conceptic.firefly.utils.MatrixStackHolder
 
 class MenuController {
     private val logger = Logger.getLogger<MenuController>()
 
     private val cameraSettings = Camera.CameraSettings.Builder
-        .zArguments(1000f, -1000f)
+        .zArguments(0.1f, 256f)
         .isPerspective(false)
         .build()
     private val camera = Camera(cameraSettings)
-    private val viewRenderer = ViewRenderer(ViewShaderResolver)
 
+    private val viewRenderer = ViewRenderer(ViewShaderResolver)
     private val buttons = mutableListOf<Button>()
 
     fun onShow(width: Int, height: Int) {
@@ -33,8 +40,11 @@ class MenuController {
 
     fun onUpdate(width: Int, height: Int) {
         camera.update(width, height)
+
+        MatrixStackHolder.pushMatrix()
         for (button in buttons)
             viewRenderer.render(button)
+        MatrixStackHolder.popMatrix()
     }
 
     fun onClicked(x: Int, y: Int) {
@@ -48,9 +58,17 @@ class MenuController {
     }
 
     private fun inflateButtons(width: Int, height: Int) {
-        val playTheGameButton = Button("PLAY THE GAME", width / 2f, 20f, width - width / 2f, 60f, Texture.NONE)
+        val playTheGameButton = Button(
+            "PLAY THE GAME",
+            Bounds(0f, 0f, width.toFloat(), height.toFloat()),
+            Vector4(0.5f, 0.3f, 0.6f, 1.0f),
+            Texture.NONE
+        )
             .apply { onClickListener = onPlayBtnClickListener }
         buttons.add(playTheGameButton)
+
+        for (button in buttons)
+            DataBinder.bind(button)
     }
 
     private val onPlayBtnClickListener = object : View.OnClickListener {

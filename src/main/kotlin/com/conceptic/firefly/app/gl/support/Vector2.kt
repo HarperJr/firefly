@@ -29,6 +29,7 @@ class Vector2(xCoord: Float, yCoord: Float) {
     }
 
     companion object {
+        const val COMPONENTS = 2
         val ZERO = Vector2(0f, 0f)
         val IDENTITY = Vector2(1f, 1f)
     }

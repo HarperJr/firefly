@@ -1,6 +1,6 @@
 package com.conceptic.firefly.app.gl.vbo
 
-data class Vbo(private val type: VboType, private val index: String) {
+class Vbo private constructor(private val type: VboType, private val index: String) {
     override fun equals(other: Any?): Boolean {
         return other?.let {
             if (other is Vbo) other.type == type && other.index == index else false
@@ -11,6 +11,10 @@ data class Vbo(private val type: VboType, private val index: String) {
         var result = type.hashCode()
         result = 31 * result + index.hashCode()
         return result
+    }
+
+    override fun toString(): String {
+        return "${type.name}_$index"
     }
 
     companion object {
