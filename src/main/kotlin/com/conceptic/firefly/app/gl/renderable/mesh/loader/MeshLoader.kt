@@ -91,6 +91,7 @@ class MeshLoader(
                     FloatBuffer.wrap(texCoordinatesBuffer)
                 }
 
+                // TODO fix this and iterate whole faces list
                 val elements = rawMesh.mFaces().mIndices()
 
                 val materialIndex = rawMesh.mMaterialIndex()
