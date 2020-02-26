@@ -1,12 +1,13 @@
 package com.conceptic.firefly.app.screen
 
+import com.conceptic.firefly.app.screen.listener.KeysListener
+import com.conceptic.firefly.app.screen.listener.MouseListener
+import com.conceptic.firefly.app.screen.listener.ScreenListener
 import com.conceptic.firefly.log.Logger
-import com.conceptic.firefly.app.screen.listener.KeyActionsListener
-import com.conceptic.firefly.app.screen.listener.MouseActionsListener
-import com.conceptic.firefly.app.screen.listener.ScreenActionsListener
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWErrorCallback
+import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.GL_TRUE
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.system.MemoryUtil.NULL
@@ -15,11 +16,12 @@ class GLFWScreen(
     screenWidth: Int,
     screenHeight: Int,
     private val title: String,
-    private val fullScreen: Boolean,
-    private val keyActionsListener: KeyActionsListener,
-    private val screenActionListener: ScreenActionsListener,
-    private val mouseActionsListener: MouseActionsListener
+    private val fullScreen: Boolean
 ) {
+    var screenListener: ScreenListener? = null
+    var mouseListener: MouseListener? = null
+    var keysListener: KeysListener? = null
+
     private val logger = Logger.getLogger<GLFWScreen>()
     private var window: Long = NULL
 
@@ -31,9 +33,9 @@ class GLFWScreen(
     var lastCursorXPos: Int = -1
     var lastCursorYPost: Int = -1
 
-    fun init() {
+    fun show() {
         GLFWErrorCallback.createPrint(System.err)
-        if (!glfwInit()) throw IllegalStateException("Unable to bindUniformLocations GLFW")
+        if (!glfwInit()) throw IllegalStateException("Unable to init GLFW")
 
         glfwDefaultWindowHints()
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE)
@@ -48,32 +50,32 @@ class GLFWScreen(
         glfwSetKeyCallback(window) { _, keyCode, _, actionCode, _ ->
             val key = Key.fromGlfw(keyCode)
             when (actionCode) {
-                GLFW_PRESS -> keyActionsListener.onPressed(key)
-                GLFW_RELEASE -> keyActionsListener.onReleased(key)
+                GLFW_PRESS -> keysListener?.onPressed(key)
+                GLFW_RELEASE -> keysListener?.onReleased(key)
             }
         }
 
         glfwSetCursorPosCallback(window) { _, x, y ->
             this.lastCursorXPos = x.toInt()
             this.lastCursorYPost = y.toInt()
-            mouseActionsListener.onMoved(this.lastCursorXPos, this.lastCursorYPost)
+            mouseListener?.onMoved(this.lastCursorXPos, this.lastCursorYPost)
         }
 
         glfwSetMouseButtonCallback(window) { _, button, action, _ ->
             when (action) {
                 GLFW_RELEASE ->
                     if (button == GLFW_MOUSE_BUTTON_LEFT)
-                        mouseActionsListener.onClicked(this.lastCursorXPos, this.lastCursorYPost)
-                GLFW_REPEAT -> if (button == GLFW_MOUSE_BUTTON_LEFT)
-                    mouseActionsListener.onDoubleClicked(this.lastCursorXPos, this.lastCursorYPost)
+                        mouseListener?.onClicked(this.lastCursorXPos, this.lastCursorYPost)
+                GLFW_PRESS -> if (button == GLFW_MOUSE_BUTTON_LEFT)
+                    mouseListener?.onPressed(this.lastCursorXPos, this.lastCursorYPost)
             }
         }
 
         glfwSetWindowSizeCallback(window) { _, newWidth, newHeight ->
             if (width != newWidth || height != newHeight) {
-                screenActionListener.onSizeChanged(width, height)
                 this.width = newWidth
                 this.height = newHeight
+                screenListener?.onSizeChanged(width, height)
             }
         }
 
@@ -97,18 +99,14 @@ class GLFWScreen(
 
         glfwMakeContextCurrent(window)
         glfwSwapInterval(1)
-
-        screenActionListener.onInit()
-    }
-
-    fun showWindow() {
-        checkWindowNotNull()
         glfwShowWindow(window)
-        screenActionListener.onShow(width, height)
+
+        GL.createCapabilities()
+        screenListener?.onShow()
     }
 
     fun destroy() {
-        screenActionListener.onDestroy()
+        screenListener?.onDestroy()
         checkWindowNotNull()
 
         glfwFreeCallbacks(window)
@@ -131,8 +129,7 @@ class GLFWScreen(
 
     fun update() {
         checkWindowNotNull()
-        screenActionListener.onUpdate()
-
+        screenListener?.onUpdate()
         glfwSwapBuffers(window)
         glfwPollEvents()
     }

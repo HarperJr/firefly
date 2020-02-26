@@ -26,7 +26,7 @@ class MenuController {
     private val logger = Logger.getLogger<MenuController>()
 
     private val cameraSettings = Camera.CameraSettings.Builder
-        .zArguments(0.1f, 256f)
+        .zArguments(-0.1f, 256f)
         .isPerspective(false)
         .build()
     private val camera = Camera(cameraSettings)
@@ -41,12 +41,7 @@ class MenuController {
     private var screenWidth = 0
     private var screenHeight = 0
 
-    fun onShow(width: Int, height: Int) {
-        screenWidth = width
-        screenHeight = height
-
-        GL11.glViewport(0, 0, width, height)
-
+    fun init() {
         inflateButtons()
 
         val meshes = meshLoader.load("elementalist/Elementalist.obj")
@@ -55,12 +50,12 @@ class MenuController {
         meshList.addAll(meshes)
     }
 
-    fun onSizeChanged(width: Int, height: Int) {
+    fun changeResolution(width: Int, height: Int) {
         screenWidth = width
         screenHeight = height
     }
 
-    fun onUpdate() {
+    fun update() {
         camera.update(screenWidth, screenHeight)
 
         MatrixStackHolder.pushMatrix()
@@ -86,7 +81,7 @@ class MenuController {
     private fun inflateButtons() {
         val playTheGameButton = Button(
             "PLAY THE GAME",
-            Bounds(0f, screenHeight.toFloat(), screenWidth.toFloat(), 0f),
+            Bounds(0f, 100f, 100f, 0f),
             Vector4(0.5f, 0.3f, 0.6f, 1.0f),
             Texture.NONE
         )

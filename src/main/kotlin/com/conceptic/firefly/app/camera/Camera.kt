@@ -1,22 +1,45 @@
 package com.conceptic.firefly.app.camera
 
 import com.conceptic.firefly.app.gl.support.Vector3
-import com.conceptic.firefly.utils.MatrixStackHolder
+import org.joml.Matrix4f
 
 class Camera(private val cameraSettings: CameraSettings) {
-    private var position = Vector3.ZERO
+    val projection: FloatArray
+        get() = projectionMatrix.get(projectionArray)
+    val view: FloatArray
+        get() = viewMatrix.get(viewArray)
+
+    // Arrays are used in order to upload matrices into them
+    private val projectionArray = FloatArray(16)
+    private val viewArray = FloatArray(16)
+
+    private val projectionMatrix = Matrix4f()
+    private val viewMatrix = Matrix4f()
+
+    private val position = Vector3.ZERO
 
     fun move(vector: Vector3) {
-        position = vector
+        position.translate(vector)
+    }
+
+    fun setPosition(vector: Vector3) {
+        position.set(vector)
     }
 
     fun update(width: Int, height: Int) {
+        projectionMatrix.identity()
         if (cameraSettings.isPerspective) {
             val aspect = if (height != 0) width.toFloat() / height.toFloat() else 0f
-            MatrixStackHolder.setPerspective(cameraSettings.fov, aspect, cameraSettings.zNear, cameraSettings.zFar)
-        } else MatrixStackHolder.setOrtho(0f, width.toFloat(), 0f, height.toFloat(), cameraSettings.zNear, cameraSettings.zFar)
-
-        MatrixStackHolder.translate(position.x, position.y, position.z)
+            projectionMatrix.setPerspective(cameraSettings.fov, aspect, cameraSettings.zNear, cameraSettings.zFar)
+        } else projectionMatrix.setOrtho(
+            0f,
+            width.toFloat(),
+            0f,
+            height.toFloat(),
+            cameraSettings.zNear,
+            cameraSettings.zFar
+        )
+        viewMatrix.translate(position.x, position.y, position.z)
     }
 
     class CameraSettings private constructor(
@@ -27,8 +50,8 @@ class Camera(private val cameraSettings: CameraSettings) {
     ) {
         object Builder {
             private var isPerspective = false
-            private var zNear = -1000f
-            private var zFar = 1000f
+            private var zNear = -10f
+            private var zFar = 10f
             private var fov = 60f
 
             fun isPerspective(isPerspective: Boolean) =

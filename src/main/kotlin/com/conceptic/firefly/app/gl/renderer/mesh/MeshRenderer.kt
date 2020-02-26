@@ -37,8 +37,4 @@ class MeshRenderer(
             GL30.glBindVertexArray(Renderer.NO_VERTEX_ARRAY)
         }
     }
-
-    override fun flush() {
-
-    }
 }

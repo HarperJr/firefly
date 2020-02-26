@@ -21,7 +21,7 @@ class Publishers {
         }
     private var keyActionsPublisherInstance: KeyActionsPublisher? = null
 
-    val mouseUpdatesPublisher: MouseActionsPublisher
+    val mouseActionsPublisher: MouseActionsPublisher
         get() = synchronized(this) {
             if (mouseUpdatesPublisherInstance == null)
                 mouseUpdatesPublisherInstance = MouseActionsPublisher()

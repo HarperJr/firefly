@@ -4,7 +4,6 @@ import com.conceptic.firefly.app.gl.support.Vector3
 import com.conceptic.firefly.app.gl.support.Vector4
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL20
-import java.nio.FloatBuffer
 
 abstract class Shader(private val shaderProgram: Int) {
     protected abstract val uniforms: List<String>
@@ -50,9 +49,9 @@ abstract class Shader(private val shaderProgram: Int) {
     fun uniformVec4(uniform: String, vector4: Vector4) =
         GL20.glUniform4f(uniformLocation(uniform), vector4.x, vector4.y, vector4.z, vector4.w)
 
-    fun uniformMat3(uniform: String, mat3: FloatBuffer) = GL20.glUniformMatrix3fv(uniformLocation(uniform), false, mat3)
+    fun uniformMat3(uniform: String, mat3: FloatArray) = GL20.glUniformMatrix3fv(uniformLocation(uniform), false, mat3)
 
-    fun uniformMat4(uniform: String, mat4: FloatBuffer) = GL20.glUniformMatrix4fv(uniformLocation(uniform), false, mat4)
+    fun uniformMat4(uniform: String, mat4: FloatArray) = GL20.glUniformMatrix4fv(uniformLocation(uniform), false, mat4)
 
     protected fun attributeLocation(attribute: Int, attributePointer: String) {
         GL20.glBindAttribLocation(shaderProgram, attribute, attributePointer)

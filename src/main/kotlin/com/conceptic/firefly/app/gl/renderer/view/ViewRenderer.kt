@@ -28,15 +28,11 @@ class ViewRenderer(
 
             GL20.glEnableVertexAttribArray(ViewShader.A_POSITION)
 
-            GL20.glDrawArrays(GL11.GL_TRIANGLE_FAN, 0, 4)
+            GL20.glDrawArrays(GL11.GL_TRIANGLE_FAN, 0, renderable.verticesCount)
 
             GL20.glDisableVertexAttribArray(ViewShader.A_POSITION)
 
             GL30.glBindVertexArray(NO_VERTEX_ARRAY)
         }
-    }
-
-    override fun flush() {
-
     }
 }

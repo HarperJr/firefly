@@ -10,6 +10,14 @@ class Vector3(xCoord: Float, yCoord: Float, zCoord: Float) {
 
     private var components = Vector3f(xCoord, yCoord, zCoord)
 
+    fun translate(vector: Vector3) {
+        components.set(x + vector.x, y + vector.y, z + vector.z)
+    }
+
+    fun set(vector: Vector3) {
+        components.set(vector.x, vector.y, vector.z)
+    }
+
     fun distance(vector: Vector3) = components.distance(vector.x, vector.y, vector.z)
 
     fun rotateX(angle: Float) = components.rotateX(angle)

@@ -2,44 +2,37 @@ package com.conceptic.firefly.app
 
 import com.conceptic.firefly.Publishers
 import com.conceptic.firefly.app.game.GameController
-import com.conceptic.firefly.app.screen.ScreenController
+import com.conceptic.firefly.app.screen.GLFWScreen
+import com.conceptic.firefly.app.screen.support.ScreenUpdatesSubscriber
 import com.conceptic.firefly.log.Logger
-import org.lwjgl.opengl.GL
-import org.lwjgl.opengl.GL11
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Main class for application instance
  */
-class Application {
+class Application(defScreenWidth: Int, defScreenHeight: Int, defTitle: String) : ScreenUpdatesSubscriber {
     private val logger = Logger.getLogger<Application>()
 
     private val publishers = Publishers()
     private val fixedUpdatesExecutor = Executors.newSingleThreadExecutor()
 
-    private val screenController = ScreenController(publishers)
+    private val screen = GLFWScreen(defScreenWidth, defScreenHeight, defTitle, false)
     private val gameController = GameController(publishers)
     private val needsUpdates: AtomicBoolean = AtomicBoolean(false)
 
     fun run() {
-        screenController.init()
-
-        GL.createCapabilities()
-        GL11.glClearColor(0.4f, 0.8f, 0.9f, 1.0f)
-        GL11.glEnable(GL11.GL_TEXTURE_2D)
-        GL11.glEnable(GL11.GL_DEPTH_TEST)
-
-        gameController.init()
+        initScreenSubscribers()
+        publishers.screenUpdatesPublisher.subscribe(this)
 
         needsUpdates.set(true)
         runCatching {
-            screenController.show()
-            runFixedUpdates()
+            screen.show()
             while (needsUpdates.get()) {
                 //Just update the screen and all subscribers to screen's updates will update theirs states
-                screenController.update()
-                needsUpdates.set(screenController.isActive())
+                if (screen.isActive()) {
+                    screen.update()
+                } else needsUpdates.set(false)
             }
         }.onFailure {
             logger.error(it)
@@ -48,32 +41,57 @@ class Application {
         shutdown()
     }
 
-    private fun shutdown() {
-        logger.info("Shutting down")
-
-        fixedUpdatesExecutor.shutdown()
-        screenController.destroy()
+    override fun onShow() {
+        gameController.onShow()
+        fixedUpdatesExecutor.submit(fixedUpdatesRunnable)
     }
 
-    private fun runFixedUpdates() {
-        var currentTimeMillis = System.currentTimeMillis()
-        fixedUpdatesExecutor.submit {
-            kotlin.runCatching {
-                while (needsUpdates.get()) {
-                    if (currentTimeMillis + FIXED_UPDATES_COOLDOWN >= System.currentTimeMillis()) {
-                        gameController.updateAsync()
-                        currentTimeMillis = System.currentTimeMillis()
-                    }
+    override fun onUpdate() {
+        gameController.onUpdate()
+    }
+
+    override fun onDestroy() {
+        gameController.onDestroy()
+        fixedUpdatesExecutor.shutdown()
+    }
+
+    override fun onSizeChanged(width: Int, height: Int) {
+        gameController.onSizeChanged(width, height)
+    }
+
+    private fun initScreenSubscribers() {
+        with(screen) {
+            screenListener = publishers.screenUpdatesPublisher
+            keysListener = publishers.keyActionsPublisher
+            mouseListener = publishers.mouseActionsPublisher
+        }
+    }
+
+    private fun shutdown() {
+        logger.info("Shutting down")
+        screen.destroy()
+    }
+
+    private val fixedUpdatesRunnable = Runnable {
+        kotlin.runCatching {
+            var currentTimeMillis = System.currentTimeMillis()
+            while (needsUpdates.get()) {
+                if (currentTimeMillis + FIXED_UPDATES_COOLDOWN >= System.currentTimeMillis()) {
+                    gameController.onFixedUpdate()
+                    currentTimeMillis = System.currentTimeMillis()
                 }
             }
         }
     }
 
     companion object {
+        private const val DEF_SCREEN_WIDTH = 1020
+        private const val DEF_SCREEN_HEIGHT = 840
+        private const val DEF_TITLE = "Spaceships"
         private const val FIXED_UPDATES_COOLDOWN = 1000L
 
         fun runApplication() {
-            val application = Application()
+            val application = Application(DEF_SCREEN_WIDTH, DEF_SCREEN_HEIGHT, DEF_TITLE)
             application.run()
         }
     }

@@ -12,51 +12,31 @@ object MatrixStackHolder {
     private val pMatrix = Matrix4f()
     private val identityMatrix = Matrix4f()
 
-    private val pMatrixBuffer = BufferUtils.createFloatBuffer(16)
-    private val mvMatrixBuffer = BufferUtils.createFloatBuffer(16)
+    private val pMatrixBuffer = FloatArray(16)
+    private val mvMatrixBuffer = FloatArray(16)
 
-    val projectionMatrixAsBuffer: FloatBuffer
+    val projectionMatrixAsBuffer: FloatArray
         get() {
-            pMatrixBuffer.clear()
             return pMatrix.get(pMatrixBuffer)
         }
 
-    val modelViewMatrixAsBuffer: FloatBuffer
+    val modelViewMatrixAsBuffer: FloatArray
         get() {
-            mvMatrixBuffer.clear()
             var mat = identityMatrix
             if (!matrixStack.isEmpty()) mat = matrixStack.peek()
             return mat.get(mvMatrixBuffer)
         }
 
+    fun identity() {
+        pMatrix.identity()
+    }
+
     fun setPerspective(fov: Float, aspect: Float, near: Float, far: Float) {
-        val ratio = 1f / Math.tan(Math.toRadians((fov / 2f).toDouble())).toFloat()
-        val yScale = ratio * aspect
-        val frustum = far - near
-
-        pMatrix.zero()
-
-        pMatrix.m00(ratio)
-        pMatrix.m11(yScale)
-        pMatrix.m22(-(far + near) / frustum)
-        pMatrix.m23(-1f)
-        pMatrix.m32(-(2f * near * far) / frustum)
+        pMatrix.perspective(fov, aspect, near, far)
     }
 
     fun setOrtho(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float) {
-        val yScale = 2f / (right - left)
-        val xScale = 2f / (top - bottom)
-        val frustum = -2f / (far - near)
-
-        pMatrix.zero()
-
-        pMatrix.m00(xScale)
-        pMatrix.m11(yScale)
-        pMatrix.m22(frustum)
-        pMatrix.m30(-(right + left) / (right - left))
-        pMatrix.m31((top + bottom) / (top - bottom))
-        pMatrix.m32((far + near) / (far - near))
-        pMatrix.m33(1f)
+        pMatrix.ortho(left, right, bottom, top, near, far)
     }
 
     fun pushMatrix() {

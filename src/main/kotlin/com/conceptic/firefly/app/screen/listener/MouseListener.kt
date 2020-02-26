@@ -1,9 +1,9 @@
 package com.conceptic.firefly.app.screen.listener
 
-interface MouseActionsListener {
+interface MouseListener {
     fun onClicked(x: Int, y: Int)
 
-    fun onDoubleClicked(x: Int, y: Int)
+    fun onPressed(x: Int, y: Int)
 
     fun onMoved(x: Int, y: Int)
 }

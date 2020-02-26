@@ -1,17 +1,24 @@
 package com.conceptic.firefly.app.screen.support
 
+import com.conceptic.firefly.app.screen.listener.ScreenListener
 import com.conceptic.firefly.support.Publisher
 
-interface ScreenUpdatesSubscriber {
-    fun onInit()
+interface ScreenUpdatesSubscriber: ScreenListener
 
-    fun onShow(width: Int, height: Int)
+class ScreenUpdatesPublisher : Publisher<ScreenUpdatesSubscriber>(), ScreenListener {
+    override fun onShow() {
+        notify { onShow() }
+    }
 
-    fun onSizeChanged(width: Int, height: Int)
+    override fun onUpdate() {
+        notify { onUpdate() }
+    }
 
-    fun onUpdate()
+    override fun onDestroy() {
+        notify { onDestroy() }
+    }
 
-    fun onDestroy()
+    override fun onSizeChanged(width: Int, height: Int) {
+        notify { onSizeChanged(width, height) }
+    }
 }
-
-class ScreenUpdatesPublisher : Publisher<ScreenUpdatesSubscriber>()
