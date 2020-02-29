@@ -1,7 +1,6 @@
 package com.conceptic.firefly.app.gl.shader.loader
 
 import com.conceptic.firefly.app.gl.shader.Shader
-import com.conceptic.firefly.app.gl.shader.ShaderStore
 import com.conceptic.firefly.app.gl.shader.definition.ShaderDefinition
 import com.conceptic.firefly.utils.FileProvider
 import org.lwjgl.opengl.GL11
@@ -18,21 +17,19 @@ class ShaderContentProvider private constructor(private val fileProvider: FilePr
     }
 }
 
-class ShaderLoader(fileProvider: FileProvider, private val shaderStore: ShaderStore) {
+class ShaderLoader(fileProvider: FileProvider) {
     private val contentProvider = ShaderContentProvider.fromFileProvider(fileProvider)
 
     fun load(shaderDefinition: ShaderDefinition): Shader {
-        if (shaderStore.contains(shaderDefinition))
-            return shaderStore[shaderDefinition]
-        val shader = shaderStore.newInstance(shaderDefinition)
+        val shader = shaderDefinition.inflateShader(GL20.glCreateProgram())
         return kotlin.runCatching {
             shaderDefinition.scripts.map { shaderScript ->
                 val shaderScriptContent = contentProvider.provide(shaderDefinition.sourceFolder + shaderScript.name)
                 createShader(shaderScript.glShaderType, String(shaderScriptContent))
-                    .also { shader.attach(it) }
+                    .also { shader.attachShaderScript(it) }
             }
             return@runCatching shader
-        }.onSuccess { shader.link() }
+        }.onSuccess { shader.linkShaderProgram() }
             .getOrThrow()
     }
 

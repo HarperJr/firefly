@@ -46,15 +46,15 @@ class GameController(
 
     }
 
-    override fun onClicked(x: Int, y: Int) {
+    override fun onClicked(x: Float, y: Float) {
 
     }
 
-    override fun onPressed(x: Int, y: Int) {
+    override fun onPressed(x: Float, y: Float) {
 
     }
 
-    override fun onMoved(x: Int, y: Int) {
+    override fun onMoved(x: Float, y: Float) {
 
     }
 }

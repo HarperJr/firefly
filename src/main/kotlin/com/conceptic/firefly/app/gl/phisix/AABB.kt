@@ -1,6 +1,6 @@
 package com.conceptic.firefly.app.gl.phisix
 
-import com.conceptic.firefly.app.gl.support.Vector2
+import com.conceptic.firefly.app.gl.support.vec.Vector2
 
 class AABB(l: Float, t: Float, r: Float, b: Float) {
     var left: Float = l

@@ -1,16 +1,20 @@
 package com.conceptic.firefly.app.gl.texture
 
-import com.conceptic.firefly.app.gl.store.Store
-import com.conceptic.firefly.app.gl.vbo.VboStore
 import org.lwjgl.opengl.GL11
 
-class TextureStore : Store<String, Texture>() {
-    override fun clear(key: String, element: Texture): Boolean {
-        GL11.glDeleteTextures(element.glPointer)
-        return true
+class TextureStore {
+    private val textures = mutableMapOf<String, Texture>()
+
+    fun getTexture(textureName: String): Texture? = textures[textureName]
+
+    fun createTexture(textureName: String): Texture {
+        return Texture(textureName, GL11.glGenTextures())
+            .also { tex -> textures[textureName] = tex }
     }
 
-    override fun create(key: String): Texture = Texture(key, GL11.glGenTextures())
+    fun deleteTexture(textureName: String): Boolean {
+        return textures.remove(textureName) != null
+    }
 
     companion object {
         private var instance: TextureStore? = null

@@ -16,16 +16,23 @@ class TextureContentProvider private constructor(private val fileProvider: FileP
     }
 }
 
-class TextureLoader(
-    private val fileProvider: FileProvider,
-    private val textureStore: TextureStore
-) {
-    fun load(textureFileName: String): Texture {
-        val textureContentProvider = TextureContentProvider.fromFileProvider(fileProvider)
-        val textureImage = textureContentProvider.provide(textureFileName)
-        val textureBuffer = textureImage.let { texture ->
-            val pixelsArray = with(IntArray(size = texture.width * texture.height)) {
-                texture.getRGB(0, 0, texture.width, texture.height, this, 0, texture.width)
+class TextureLoader(private val fileProvider: FileProvider) {
+    private val textureStore: TextureStore = TextureStore.get()
+
+    fun load(textureName: String): Texture {
+        return textureStore.getTexture(textureName) ?: let {
+            val textureContentProvider = TextureContentProvider.fromFileProvider(fileProvider)
+            return createTexture(
+                textureImage = textureContentProvider.provide(textureName),
+                texture = textureStore.createTexture(textureName)
+            )
+        }
+    }
+
+    private fun createTexture(textureImage: BufferedImage, texture: Texture): Texture {
+        val textureBuffer = textureImage.let { image ->
+            val pixelsArray = with(IntArray(size = image.width * image.height)) {
+                image.getRGB(0, 0, image.width, image.height, this, 0, image.width)
             }
             val pixelsByteBuffer = BufferUtils.createByteBuffer(pixelsArray.size * BYTES_PER_PIXEL_RGBA)
             pixelsArray.forEachIndexed { i, pixel ->
@@ -39,7 +46,6 @@ class TextureLoader(
             pixelsByteBuffer.flip() as ByteBuffer
         }
 
-        val texture = textureStore.newInstance(textureFileName)
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.glPointer)
 
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST)

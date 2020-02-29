@@ -1,6 +1,6 @@
 package com.conceptic.firefly.utils
 
-import com.conceptic.firefly.app.gl.support.Vector3
+import com.conceptic.firefly.app.gl.support.vec.Vector3
 import com.conceptic.firefly.support.GsonAdapters
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder

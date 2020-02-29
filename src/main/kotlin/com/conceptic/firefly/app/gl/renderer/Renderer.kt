@@ -1,11 +1,8 @@
 package com.conceptic.firefly.app.gl.renderer
 
-import com.conceptic.firefly.app.gl.renderable.Renderable
+import com.conceptic.firefly.app.gl.GLEntity
+import com.conceptic.firefly.app.gl.shader.Shader
 
-interface Renderer<R : Renderable> {
-    fun render(renderable: R)
-
-    companion object {
-        const val NO_VERTEX_ARRAY = 0
-    }
+interface Renderer<T : GLEntity> {
+    fun render(entity: T, shader: Shader)
 }

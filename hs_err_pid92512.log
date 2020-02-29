@@ -84,7 +84,7 @@ Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
 j  org.lwjgl.system.JNI.invokePP(JIJ)J+0
 j  org.lwjgl.assimp.Assimp.naiImportFile(JI)J+7
 j  org.lwjgl.assimp.Assimp.aiImportFile(Ljava/nio/ByteBuffer;I)Lorg/lwjgl/assimp/AIScene;+15
-j  com.conceptic.firefly.app.gl.renderable.mesh.loader.MeshLoader.load(Ljava/lang/String;)Ljava/util/List;+29
+j  com.conceptic.firefly.app.gl.mesh.loader.MeshLoader.load(Ljava/lang/String;)Ljava/util/List;+29
 j  com.conceptic.firefly.app.menu.MenuController.onShow(II)V+27
 j  com.conceptic.firefly.app.game.GameController.onShow(II)V+6
 j  com.conceptic.firefly.app.screen.ScreenController$ScreenActionsListenerImpl$onShow$1.invoke(Lcom/conceptic/firefly/app/screen/support/ScreenUpdatesSubscriber;)V+15

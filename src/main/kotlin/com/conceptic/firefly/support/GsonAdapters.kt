@@ -1,6 +1,6 @@
 package com.conceptic.firefly.support
 
-import com.conceptic.firefly.app.gl.support.Vector3
+import com.conceptic.firefly.app.gl.support.vec.Vector3
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
@@ -25,7 +25,11 @@ object GsonAdapters {
                         components.add(nextDouble().toFloat())
                     endArray()
                 }
-                Vector3(components.getOrNull(0) ?: 0f, components.getOrNull(1) ?: 0f, components.getOrNull(2) ?: 0f)
+                Vector3(
+                    components.getOrNull(0) ?: 0f,
+                    components.getOrNull(1) ?: 0f,
+                    components.getOrNull(2) ?: 0f
+                )
             }
         }
     }

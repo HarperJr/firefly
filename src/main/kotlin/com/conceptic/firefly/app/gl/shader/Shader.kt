@@ -1,13 +1,13 @@
 package com.conceptic.firefly.app.gl.shader
 
-import com.conceptic.firefly.app.gl.support.Vector3
-import com.conceptic.firefly.app.gl.support.Vector4
+import com.conceptic.firefly.app.gl.support.vec.Vector3
+import com.conceptic.firefly.app.gl.support.vec.Vector4
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL20
 
 abstract class Shader(private val shaderProgram: Int) {
     protected abstract val uniforms: List<String>
-    private val sharedUniforms = listOf(U_PROJECTION_MATRIX, U_MODEL_VIEW_MATRIX)
+    private val sharedUniforms = listOf(U_MODEL_MATRIX, U_VIEW_MATRIX, U_PROJECTION_MATRIX)
 
     abstract fun bindAttributes()
 
@@ -17,11 +17,11 @@ abstract class Shader(private val shaderProgram: Int) {
         GL20.glUseProgram(NO_PROGRAM)
     }
 
-    fun attach(shaderScript: Int) {
+    fun attachShaderScript(shaderScript: Int) {
         GL20.glAttachShader(shaderProgram, shaderScript)
     }
 
-    fun link() {
+    fun linkShaderProgram() {
         GL20.glLinkProgram(shaderProgram)
         GL20.glValidateProgram(shaderProgram)
 
@@ -35,7 +35,7 @@ abstract class Shader(private val shaderProgram: Int) {
         bindUniforms()
     }
 
-    fun delete() {
+    fun deleteShaderProgram() {
         GL20.glDeleteProgram(shaderProgram)
     }
 
@@ -71,7 +71,8 @@ abstract class Shader(private val shaderProgram: Int) {
 
     companion object {
         private const val NO_PROGRAM = 0
+        const val U_MODEL_MATRIX = "modelMatrix"
+        const val U_VIEW_MATRIX = "viewMatrix"
         const val U_PROJECTION_MATRIX = "projectionMatrix"
-        const val U_MODEL_VIEW_MATRIX = "modelViewMatrix"
     }
 }
