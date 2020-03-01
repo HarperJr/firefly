@@ -5,6 +5,8 @@ import com.conceptic.firefly.app.game.GameController
 import com.conceptic.firefly.app.screen.GLFWScreen
 import com.conceptic.firefly.app.screen.support.ScreenUpdatesSubscriber
 import com.conceptic.firefly.log.Logger
+import com.conceptic.firefly.support.AsyncDispatcher
+import org.lwjgl.opengl.GL11
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -18,7 +20,7 @@ class Application(defScreenWidth: Int, defScreenHeight: Int, defTitle: String) :
     private val fixedUpdatesExecutor = Executors.newSingleThreadExecutor()
 
     private val screen = GLFWScreen(defScreenWidth, defScreenHeight, defTitle, false)
-    private val gameController = GameController(publishers)
+    private val gameController = GameController(screen, publishers)
     private val needsUpdates: AtomicBoolean = AtomicBoolean(false)
 
     fun run() {
@@ -30,6 +32,7 @@ class Application(defScreenWidth: Int, defScreenHeight: Int, defTitle: String) :
             screen.show()
             while (needsUpdates.get()) {
                 //Just update the screen and all subscribers to screen's updates will update theirs states
+                AsyncDispatcher.get().dispatch()
                 if (screen.isActive()) {
                     screen.update()
                 } else needsUpdates.set(false)

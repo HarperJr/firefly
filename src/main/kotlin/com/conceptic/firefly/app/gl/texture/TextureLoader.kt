@@ -8,22 +8,13 @@ import java.nio.ByteBuffer
 import javax.imageio.ImageIO
 
 
-class TextureContentProvider private constructor(private val fileProvider: FileProvider) {
-    fun provide(textureFileName: String): BufferedImage = ImageIO.read(fileProvider.provideFile(textureFileName))
-
-    companion object {
-        fun fromFileProvider(fileProvider: FileProvider) = TextureContentProvider(fileProvider)
-    }
-}
-
 class TextureLoader(private val fileProvider: FileProvider) {
     private val textureStore: TextureStore = TextureStore.get()
 
     fun load(textureName: String): Texture {
         return textureStore.getTexture(textureName) ?: let {
-            val textureContentProvider = TextureContentProvider.fromFileProvider(fileProvider)
             return createTexture(
-                textureImage = textureContentProvider.provide(textureName),
+                textureImage = ImageIO.read(fileProvider.provideFile(textureName)),
                 texture = textureStore.createTexture(textureName)
             )
         }

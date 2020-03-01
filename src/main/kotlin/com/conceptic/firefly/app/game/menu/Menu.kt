@@ -2,51 +2,74 @@ package com.conceptic.firefly.app.game.menu
 
 import com.conceptic.firefly.app.game.SceneEntity
 import com.conceptic.firefly.app.game.camera.Camera
-import com.conceptic.firefly.app.gl.renderer.ButtonRenderer
+import com.conceptic.firefly.app.game.camera.CameraHolder
+import com.conceptic.firefly.app.gl.mesh.Mesh
+import com.conceptic.firefly.app.gl.mesh.loader.MeshLoader
 import com.conceptic.firefly.app.gl.phisix.AABB
-import com.conceptic.firefly.app.gl.shader.Shader
-import com.conceptic.firefly.app.gl.shader.definition.ViewShaderDefinition
-import com.conceptic.firefly.app.gl.shader.loader.ShaderLoader
+import com.conceptic.firefly.app.gl.renderer.impl.ButtonRenderer
+import com.conceptic.firefly.app.gl.renderer.impl.MeshRenderer
 import com.conceptic.firefly.app.gl.support.vec.Vector4
 import com.conceptic.firefly.app.gl.view.Button
 import com.conceptic.firefly.app.screen.GLFWScreen
 import com.conceptic.firefly.app.screen.listener.MouseListener
+import com.conceptic.firefly.support.loadAsync
 import com.conceptic.firefly.utils.FileProvider
+import org.lwjgl.opengl.GL11
 
 class Menu(private val screen: GLFWScreen) : SceneEntity, MouseListener {
-    private val camera = Camera(isPerspective = false)
+    private val camera = Camera(isPerspective = false, near = -1f, far = 100f)
     private val buttonRenderer = ButtonRenderer()
-    private val viewShader: Shader by lazy {
-        ShaderLoader(FileProvider.get()).load(ViewShaderDefinition)
-    }
+    private val meshRenderer = MeshRenderer()
 
     private val buttons = mutableListOf<Button>()
+    private var meshes: List<Mesh> = emptyList()
 
     override fun create() {
+        GL11.glClearColor(0.4f, 0.4f, 1f, 1f)
+
+        CameraHolder.get().activeCamera = camera
+
+        inflateMesh()
         inflateButtons()
     }
 
     override fun destroy() {
         for (button in buttons)
             button.destroy()
+        for(mesh in meshes)
+            mesh.destroy()
     }
 
-    override fun render() {
+    override fun update() {
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_DEPTH_BUFFER_BIT)
+
+        camera.update(screen.width, screen.height)
         for (button in buttons)
-            viewShader.use {
-                uniformMat4(Shader.U_VIEW_MATRIX, camera.view)
-                uniformMat4(Shader.U_PROJECTION_MATRIX, camera.projection)
-                buttonRenderer.render(button, this)
+            buttonRenderer.render(button)
+        for(mesh in meshes)
+            meshRenderer.render(mesh)
+    }
+
+    private fun inflateMesh() {
+        loadAsync {
+            MeshLoader(FileProvider.get()).load("elementalist/Elementalist.obj")
+        }.then { meshes ->
+            meshes.forEach {
+                it.create()
             }
+            this.meshes = meshes
+        }
     }
 
     private fun inflateButtons() {
         val startButton = Button(
             name = "startButton",
-            aabb = AABB(0f, screen.height.toFloat(), 0f, screen.height.toFloat()),
+            aabb = AABB(64f, screen.height.toFloat() - 124f, screen.width.toFloat() - 64f, screen.height.toFloat() - 164f),
             color = Vector4(0.5f, 0.4f, 0.2f, 1f),
             text = "Start the game"
         )
+
+        startButton.create()
         buttons.add(startButton)
     }
 

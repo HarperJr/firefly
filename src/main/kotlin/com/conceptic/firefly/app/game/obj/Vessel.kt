@@ -11,7 +11,7 @@ class Vessel(private val mesh: Mesh) : GameEntity() {
 
     }
 
-    override fun render() {
+    override fun update() {
 
     }
 }

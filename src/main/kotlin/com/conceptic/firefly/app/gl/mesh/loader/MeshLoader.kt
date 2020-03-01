@@ -1,5 +1,6 @@
 package com.conceptic.firefly.app.gl.mesh.loader
 
+import com.conceptic.firefly.app.gl.ContentProvider
 import com.conceptic.firefly.app.gl.mesh.Mesh
 import com.conceptic.firefly.app.gl.mesh.MeshData
 import com.conceptic.firefly.app.gl.mesh.material.Material
@@ -14,16 +15,9 @@ import java.nio.ByteBuffer
 import java.nio.IntBuffer
 
 
-class MeshContentProvider private constructor(private val fileProvider: FileProvider) {
-    fun provide(meshFileName: String): ByteArray =
-        fileProvider.provideFileContent(MESH_DIR + meshFileName)
-
-    companion object {
-        private const val MESH_DIR = "meshes/"
-
-        fun fromFileProvider(fileProvider: FileProvider) =
-            MeshContentProvider(fileProvider)
-    }
+class MeshContentProvider(fileProvider: FileProvider) : ContentProvider(fileProvider) {
+    override val dir: String
+        get() = "meshes/"
 }
 
 /**
@@ -33,7 +27,7 @@ class MeshLoader(private val fileProvider: FileProvider) {
     private val textureLoader: TextureLoader = TextureLoader(fileProvider)
 
     fun load(meshFileName: String): List<Mesh> {
-        val contentProvider = MeshContentProvider.fromFileProvider(fileProvider)
+        val contentProvider = MeshContentProvider(fileProvider)
         val meshContent = contentProvider.provide(meshFileName)
 
         val buffer = allocateMemory(meshContent)
@@ -106,7 +100,6 @@ class MeshLoader(private val fileProvider: FileProvider) {
                 val material = materials[mesh.mMaterialIndex()]
                 val meshData = MeshData(vertices, texCoords, normals, elements)
                 return@map Mesh(name, meshData, material)
-                    .also { it.create() }
             }
         } else emptyList()
     }

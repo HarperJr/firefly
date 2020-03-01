@@ -66,7 +66,10 @@ object ExternalStorageFileProvider : FileProvider {
 
 object ResourcesFileProvider : FileProvider {
     override val available: Boolean
-        get() = runCatching { classLoader }.getOrNull()?.let { true } ?: false
+        get() {
+            val classLoader = runCatching { classLoader }.getOrNull()
+            return classLoader != null
+        }
 
     private val classLoader
         get() = ResourcesFileProvider::class.java.classLoader

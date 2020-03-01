@@ -5,5 +5,5 @@ interface SceneEntity {
 
     fun destroy()
 
-    fun render()
+    fun update()
 }

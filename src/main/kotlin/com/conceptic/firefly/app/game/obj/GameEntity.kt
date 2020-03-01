@@ -20,8 +20,7 @@ abstract class GameEntity : SceneEntity {
         position.set(vec)
     }
 
-    open fun update() {
+    override fun update() {
         modelMatrix.translate(position)
-        render()
     }
 }
