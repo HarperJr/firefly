@@ -1,9 +1,13 @@
 package com.conceptic.firefly.app.game
 
-interface SceneEntity {
-    fun create()
+import com.conceptic.firefly.app.game.camera.Camera
 
-    fun destroy()
+abstract class SceneEntity {
+    abstract val camera: Camera
 
-    fun update()
+    abstract fun create()
+
+    abstract fun update()
+
+    abstract fun destroy()
 }

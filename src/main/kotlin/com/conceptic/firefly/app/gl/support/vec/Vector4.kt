@@ -21,6 +21,10 @@ class Vector4(xCoord: Float, yCoord: Float, zCoord: Float, wCoord: Float) {
 
     fun toVector3() = Vector3(x, y, z)
 
+    operator fun minus(value: Float): Vector4 {
+        return Vector4(x - value, y - value, z - value, w - value)
+    }
+
     override fun equals(other: Any?): Boolean {
         return other?.let {
             if (other is Vector4) {
@@ -41,5 +45,14 @@ class Vector4(xCoord: Float, yCoord: Float, zCoord: Float, wCoord: Float) {
         const val COMPONENTS = 4
         val ZERO = Vector4(0f, 0f, 0f, 0f)
         val IDENTITY = Vector4(1f, 1f, 1f, 1f)
+
+        fun fromBytes(bytes: Long): Vector4 {
+            return Vector4(
+                (bytes shr 0x18 and 0xff) / 255f,
+                (bytes shr 0x12 and 0xff) / 255f,
+                (bytes shr 0x06 and 0xff) / 255f,
+                (bytes shr 0x00 and 0xff) / 255f
+            )
+        }
     }
 }

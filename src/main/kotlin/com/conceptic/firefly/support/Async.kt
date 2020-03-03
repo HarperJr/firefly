@@ -12,7 +12,7 @@ class AsyncOperation<T>(private val blockingFunc: () -> T) {
         }
     private val disposed = AtomicBoolean(false)
 
-    fun then(consumer: (T) -> Unit): AsyncOperation<T> {
+    fun dispatch(consumer: (T) -> Unit): AsyncOperationsDisposable {
         val future = asyncFunc.invoke()
         pooledExecutor.submit {
             val result = future.get()
@@ -24,11 +24,27 @@ class AsyncOperation<T>(private val blockingFunc: () -> T) {
             } else pooledExecutor.shutdown()
         }
 
-        return this
+        return AsyncOperationsDisposable(this)
     }
 
     fun dispose() {
         disposed.set(true)
+    }
+}
+
+class AsyncOperationsDisposable(private val asyncOperation: AsyncOperation<*>?) {
+    private var disposed = false
+
+    fun dispose() {
+        if (!disposed) {
+            asyncOperation?.dispose()
+            disposed = true
+        }
+    }
+
+    companion object {
+        fun disposed() = AsyncOperationsDisposable(null)
+            .apply { disposed = true }
     }
 }
 

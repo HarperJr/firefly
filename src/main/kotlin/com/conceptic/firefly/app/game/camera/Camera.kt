@@ -9,6 +9,10 @@ class Camera(
     private val near: Float = -0.5f,
     private val far: Float = 0.5f
 ) {
+    var width: Int = 0
+        private set
+    var height: Int = 0
+        private set
     val projection: FloatArray
         get() = projectionMatrix.toFloatArray()
     val view: FloatArray
@@ -28,6 +32,9 @@ class Camera(
     }
 
     fun update(width: Int, height: Int) {
+        this.width = width
+        this.height = height
+
         projectionMatrix.identity()
         viewMatrix.identity()
 

@@ -30,8 +30,8 @@ class GLFWScreen(
     var height: Int = screenHeight
         private set
 
-    var lastCursorXPos: Float = -1f
-    var lastCursorYPost: Float = -1f
+    private var lastCursorXPos: Float = -1f
+    private var lastCursorYPost: Float = -1f
 
     fun show() {
         GLFWErrorCallback.createPrint(System.err)
@@ -57,7 +57,7 @@ class GLFWScreen(
 
         glfwSetCursorPosCallback(window) { _, x, y ->
             this.lastCursorXPos = x.toFloat()
-            this.lastCursorYPost = y.toFloat()
+            this.lastCursorYPost = height - y.toFloat()
             mouseListener?.onMoved(this.lastCursorXPos, this.lastCursorYPost)
         }
 

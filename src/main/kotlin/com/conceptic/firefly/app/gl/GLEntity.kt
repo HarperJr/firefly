@@ -1,40 +1,34 @@
 package com.conceptic.firefly.app.gl
 
+import com.conceptic.firefly.app.gl.support.GL
 import com.conceptic.firefly.app.gl.support.mat.Matrix4
-import org.lwjgl.opengl.GL30
 
 abstract class GLEntity(val name: String) {
-    val model: FloatArray
+    val modelTransform: FloatArray
         get() = modelMatrix.toFloatArray()
-
-    private var vao: Int = -1
-    private val vboList = mutableListOf<Int>()
-
+    private val glEntityBufferUtils: GLEntityBufferUtils = GLEntityBufferUtils()
     private val modelMatrix = Matrix4()
 
     fun create() {
-        vao = GL30.glGenVertexArrays()
-        bind {
-            loadInternal()
+        glEntityBufferUtils.create()
+        GL.bindVertexArray(glEntityBufferUtils.vao) {
+            createInternal(glEntityBufferUtils)
         }
     }
+
+    fun render() {
+        GL.bindVertexArray(glEntityBufferUtils.vao) {
+            renderInternal(glEntityBufferUtils)
+        }
+    }
+
+    protected abstract fun createInternal(glEntityBufferUtils: GLEntityBufferUtils)
+
+    protected abstract fun renderInternal(glEntityBufferUtils: GLEntityBufferUtils)
 
     fun destroy() {
-        for (vbo in vboList)
-            GL30.glDeleteBuffers(vbo)
-        GL30.glDeleteVertexArrays(vao)
-    }
-
-    fun bind(invocation: () -> Unit) {
-        if (vao != -1) {
-            GL30.glBindVertexArray(vao)
-            invocation.invoke()
-            GL30.glBindVertexArray(0)
-
-            modelMatrix.identity()
-        } else {
-            throw IllegalStateException("GLEntity $name is not loaded yet. Please create this before binding")
-        }
+        glEntityBufferUtils.clear()
+        modelMatrix.identity()
     }
 
     fun translate(x: Float, y: Float, z: Float) {
@@ -48,11 +42,4 @@ abstract class GLEntity(val name: String) {
     fun scale(x: Float, y: Float, z: Float) {
         modelMatrix.scale(x, y, z)
     }
-
-    protected fun createVbo(): Int {
-        return GL30.glGenBuffers()
-            .also { vbo -> vboList.add(vbo) }
-    }
-
-    protected abstract fun loadInternal()
 }

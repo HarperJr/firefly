@@ -1,52 +1,67 @@
 package com.conceptic.firefly.app.gl.view
 
+import com.conceptic.firefly.app.game.obj.ui.UIEntity
 import com.conceptic.firefly.app.gl.GLEntity
+import com.conceptic.firefly.app.gl.GLEntityBufferUtils
 import com.conceptic.firefly.app.gl.phisix.AABB
 import com.conceptic.firefly.app.gl.shader.view.ViewShader
+import com.conceptic.firefly.app.gl.support.GL
 import com.conceptic.firefly.app.gl.support.vec.Vector2
 import com.conceptic.firefly.app.gl.support.vec.Vector3
-import com.conceptic.firefly.app.gl.support.vec.Vector4
 import com.conceptic.firefly.app.gl.texture.Texture
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL30
 
-open class View(
-    name: String, val aabb: AABB, val color: Vector4,
-    private val texture: Texture = Texture.NONE
-) : GLEntity(name) {
-    private val vertices = floatArrayOf(
-        aabb.left, aabb.top, 0f,
-        aabb.right, aabb.top, 0f,
-        aabb.right, aabb.bottom, 0f,
-        aabb.left, aabb.bottom, 0f
-    )
+open class View(val aabb: AABB, private val texture: Texture = Texture.NONE) : GLEntity("view") {
+    private var vertexVbo: Int = -1
 
-    val verticesCount: Int
-        get() = 4 // Four vertices: leftTop, rightTop, rightBottom, leftBottom
+    private val vertices: FloatArray
+        get() = aabb.toFloatArray()
 
-    override fun loadInternal() {
-        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, createVbo())
-        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, vertices, GL30.GL_STATIC_DRAW)
-        GL30.glVertexAttribPointer(
-            ViewShader.A_POSITION,
-            Vector3.COMPONENTS,
-            GL11.GL_FLOAT,
-            false,
-            Vector3.COMPONENTS * 4,
-            0L
+    private val hasTexture: Boolean
+        get() = texture != Texture.NONE
+
+    override fun createInternal(glEntityBufferUtils: GLEntityBufferUtils) {
+        vertexVbo = glEntityBufferUtils.createVbo()
+        GL.bufferData(
+            vbo = vertexVbo,
+            pointer = ViewShader.A_POSITION,
+            size = Vector3.COMPONENTS,
+            type = GL30.GL_ARRAY_BUFFER,
+            arrayBuffer = vertices,
+            mode = GL30.GL_STATIC_DRAW
         )
 
-        if (texture != Texture.NONE) {
-            GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, createVbo())
-            GL30.glBufferData(GL30.GL_ARRAY_BUFFER, floatArrayOf(), GL30.GL_STATIC_DRAW)
-            GL30.glVertexAttribPointer(
-                ViewShader.A_TEX_COORD,
-                Vector2.COMPONENTS,
-                GL11.GL_FLOAT,
-                false,
-                Vector2.COMPONENTS * 4,
-                0L
+        if (hasTexture) {
+            GL.bufferData(
+                vbo = glEntityBufferUtils.createVbo(),
+                pointer = ViewShader.A_TEX_COORD,
+                size = Vector2.COMPONENTS,
+                type = GL30.GL_ARRAY_BUFFER,
+                arrayBuffer = floatArrayOf(), // TODO create texCoods array and fill buffer
+                mode = GL30.GL_STATIC_DRAW
             )
         }
+    }
+
+    override fun renderInternal(glEntityBufferUtils: GLEntityBufferUtils) {
+        GL30.glEnableVertexAttribArray(ViewShader.A_POSITION)
+        if (hasTexture)
+            GL30.glEnableVertexAttribArray(ViewShader.A_TEX_COORD)
+
+//        GL.bindBufferArray(vertexVbo, GL30.GL_ARRAY_BUFFER) {
+//            GL30.glBufferSubData(GL30.GL_ARRAY_BUFFER, 0, vertices)
+//        }
+
+        GL30.glDrawArrays(GL11.GL_TRIANGLE_FAN, 0, VIEW_VERTICES_COUNT)
+
+        if (hasTexture)
+            GL30.glDisableVertexAttribArray(ViewShader.A_TEX_COORD)
+        GL30.glDisableVertexAttribArray(ViewShader.A_POSITION)
+    }
+
+
+    companion object {
+        private const val VIEW_VERTICES_COUNT = 4
     }
 }
