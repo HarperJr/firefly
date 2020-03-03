@@ -17,8 +17,4 @@ class ScreenUpdatesPublisher : Publisher<ScreenUpdatesSubscriber>(), ScreenListe
     override fun onDestroy() {
         notify { onDestroy() }
     }
-
-    override fun onSizeChanged(width: Int, height: Int) {
-        notify { onSizeChanged(width, height) }
-    }
 }

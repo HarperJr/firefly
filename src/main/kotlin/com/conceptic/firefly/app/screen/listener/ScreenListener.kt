@@ -6,6 +6,4 @@ interface ScreenListener {
     fun onUpdate()
 
     fun onDestroy()
-
-    fun onSizeChanged(width: Int, height: Int)
 }

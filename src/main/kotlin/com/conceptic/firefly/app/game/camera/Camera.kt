@@ -9,9 +9,9 @@ class Camera(
     private val near: Float = -0.5f,
     private val far: Float = 0.5f
 ) {
-    var width: Int = 0
+    var width: Float = 0f
         private set
-    var height: Int = 0
+    var height: Float = 0f
         private set
     val projection: FloatArray
         get() = projectionMatrix.toFloatArray()
@@ -31,25 +31,25 @@ class Camera(
         position.set(vector)
     }
 
-    fun update(width: Int, height: Int) {
+    fun update(width: Float, height: Float) {
         this.width = width
         this.height = height
 
         projectionMatrix.identity()
-        viewMatrix.identity()
-
         if (isPerspective) {
             setPerspective(width, height)
         } else setOrtho(width, height)
+
+        viewMatrix.identity()
         viewMatrix.translate(position.x, position.y, position.z)
     }
 
-    private fun setPerspective(width: Int, height: Int) {
-        val aspect = if (height != 0) width.toFloat() / height.toFloat() else 0f
+    private fun setPerspective(width: Float, height: Float) {
+        val aspect = if (height != 0f) width / height else 0f
         projectionMatrix.setPerspective(fov, aspect, near, far)
     }
 
-    private fun setOrtho(width: Int, height: Int) {
-        projectionMatrix.setOrtho(0f, width.toFloat(), 0f, height.toFloat(), near, far)
+    private fun setOrtho(width: Float, height: Float) {
+        projectionMatrix.setOrtho(0f, width, 0f, height, near, far)
     }
 }

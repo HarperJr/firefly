@@ -8,7 +8,7 @@ interface UIEntity : MouseListener {
 
     fun create()
 
-    fun render(shader: Shader, width: Int, height: Int)
+    fun render(shader: Shader, width: Float, height: Float)
 
     fun destroy()
 

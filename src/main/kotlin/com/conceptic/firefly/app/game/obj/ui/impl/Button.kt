@@ -36,7 +36,7 @@ class Button(
         buttonView.create()
     }
 
-    override fun render(shader: Shader, width: Int, height: Int) {
+    override fun render(shader: Shader, width: Float, height: Float) {
         buttonView.apply {
             shader.uniformMat4(Shader.U_MODEL_MATRIX, buttonView.modelTransform)
             shader.uniformVec4(ViewShader.U_COLOR, currentColor)

@@ -7,7 +7,7 @@ class Matrix4 {
     private val floatArray = FloatArray(16)
     private val matrix = Matrix4f()
 
-    fun identity() = matrix.identity()
+    fun identity(): Matrix4f = matrix.identity()
 
     fun toFloatArray(): FloatArray = matrix.get(floatArray)
 

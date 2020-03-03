@@ -50,16 +50,14 @@ class Application(defScreenWidth: Int, defScreenHeight: Int, defTitle: String) :
     }
 
     override fun onUpdate() {
+        GL11.glViewport(0, 0, screen.width, screen.height)
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT or GL11.GL_DEPTH_BUFFER_BIT)
         gameController.onUpdate()
     }
 
     override fun onDestroy() {
         gameController.onDestroy()
         fixedUpdatesExecutor.shutdown()
-    }
-
-    override fun onSizeChanged(width: Int, height: Int) {
-        gameController.onSizeChanged(width, height)
     }
 
     private fun initScreenSubscribers() {
@@ -88,8 +86,8 @@ class Application(defScreenWidth: Int, defScreenHeight: Int, defTitle: String) :
     }
 
     companion object {
-        private const val DEF_SCREEN_WIDTH = 1020
-        private const val DEF_SCREEN_HEIGHT = 840
+        private const val DEF_SCREEN_WIDTH = 1420
+        private const val DEF_SCREEN_HEIGHT = 940
         private const val DEF_TITLE = "Spaceships"
         private const val FIXED_UPDATES_COOLDOWN = 1000L
 

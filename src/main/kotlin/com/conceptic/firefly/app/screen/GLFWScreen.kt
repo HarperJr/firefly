@@ -75,7 +75,6 @@ class GLFWScreen(
             if (width != newWidth || height != newHeight) {
                 this.width = newWidth
                 this.height = newHeight
-                screenListener?.onSizeChanged(width, height)
             }
         }
 

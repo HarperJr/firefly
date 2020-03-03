@@ -41,7 +41,7 @@ class GameController(
         menu.destroy()
     }
 
-    fun onSizeChanged(width: Int, height: Int) {
+    fun onSizeChanged(width: Float, height: Float) {
 
     }
 
@@ -54,14 +54,14 @@ class GameController(
     }
 
     override fun onClicked(x: Float, y: Float) {
-
+        menu.onClicked(x, y)
     }
 
     override fun onPressed(x: Float, y: Float) {
-
+        menu.onPressed(x, y)
     }
 
     override fun onMoved(x: Float, y: Float) {
-
+        menu.onMoved(x, y)
     }
 }
