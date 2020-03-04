@@ -39,9 +39,8 @@ void phongLighting(in Material mat, in Light light, in vec3 normal, in vec3 look
 
 void main() {
     vec4 ambientColor = vec4(1.0);
+    vec4 diffuse = vec4(1.0);
 
-    for (int i = 0; i < lights.length; i++)
-    ambientColor = lambertLighting(ambientColor, material.diffuse, lights[i], fragParams.normal);
-
+    ambientColor = lambertLighting(ambientColor, diffuse, Light(vec4(1.0), vec3(0.75, 0.95, -0.5)), fragParams.normal);
     outColor = ambientColor;
 }

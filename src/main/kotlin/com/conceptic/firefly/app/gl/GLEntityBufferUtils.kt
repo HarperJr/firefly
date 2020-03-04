@@ -15,7 +15,7 @@ class GLEntityBufferUtils {
     fun create() {
         if (innerVao == -1) {
             innerVao = GL30.glGenVertexArrays()
-        } else throw IllegalStateException("Only one vao init is available per instance")
+        }
     }
 
     fun createVbo(): Int {

@@ -12,11 +12,11 @@ class Matrix4 {
     fun toFloatArray(): FloatArray = matrix.get(floatArray)
 
     fun setOrtho(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float) {
-        matrix.ortho(left, right, bottom, top, near, far)
+        matrix.setOrtho(left, right, bottom, top, near, far)
     }
 
     fun setPerspective(fov: Float, aspect: Float, near: Float, far: Float) {
-        matrix.perspective(fov, aspect, near, far)
+        matrix.setPerspective(fov, aspect, near, far)
     }
 
     fun rotate(a: Float, x: Float, y: Float, z: Float) {

@@ -7,6 +7,7 @@ import com.conceptic.firefly.app.gl.shader.mesh.MeshShader
 import com.conceptic.firefly.app.gl.support.GL
 import com.conceptic.firefly.app.gl.support.vec.Vector2
 import com.conceptic.firefly.app.gl.support.vec.Vector3
+import com.conceptic.firefly.app.gl.texture.Texture
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL30
 
@@ -16,6 +17,8 @@ import org.lwjgl.opengl.GL30
 class Mesh constructor(name: String, private val meshData: MeshData, val material: Material) : GLEntity(name) {
     private val elementsCount: Int
         get() = meshData.elements.count()
+    val hasTexture: Boolean
+        get() = material.texAmbient != Texture.NONE
 
     override fun createInternal(glEntityBufferUtils: GLEntityBufferUtils) {
         GL.bufferData(
@@ -27,14 +30,16 @@ class Mesh constructor(name: String, private val meshData: MeshData, val materia
             mode = GL30.GL_STATIC_DRAW
         )
 
-        GL.bufferData(
-            vbo = glEntityBufferUtils.createVbo(),
-            pointer = MeshShader.A_TEX_COORD,
-            size = Vector2.COMPONENTS,
-            type = GL30.GL_ARRAY_BUFFER,
-            arrayBuffer = meshData.texCoords,
-            mode = GL30.GL_STATIC_DRAW
-        )
+        if (hasTexture) {
+            GL.bufferData(
+                vbo = glEntityBufferUtils.createVbo(),
+                pointer = MeshShader.A_TEX_COORD,
+                size = Vector2.COMPONENTS,
+                type = GL30.GL_ARRAY_BUFFER,
+                arrayBuffer = meshData.texCoords,
+                mode = GL30.GL_STATIC_DRAW
+            )
+        }
 
         GL.bufferData(
             vbo = glEntityBufferUtils.createVbo(),
@@ -51,13 +56,15 @@ class Mesh constructor(name: String, private val meshData: MeshData, val materia
 
     override fun renderInternal(glEntityBufferUtils: GLEntityBufferUtils) {
         GL30.glEnableVertexAttribArray(MeshShader.A_POSITION)
-        GL30.glEnableVertexAttribArray(MeshShader.A_TEX_COORD)
+        if (hasTexture)
+            GL30.glEnableVertexAttribArray(MeshShader.A_TEX_COORD)
         GL30.glEnableVertexAttribArray(MeshShader.A_NORMALS)
 
         GL30.glDrawElements(GL11.GL_TRIANGLES, elementsCount, GL11.GL_UNSIGNED_INT, 0)
 
         GL30.glDisableVertexAttribArray(MeshShader.A_POSITION)
-        GL30.glDisableVertexAttribArray(MeshShader.A_TEX_COORD)
+        if (hasTexture)
+            GL30.glDisableVertexAttribArray(MeshShader.A_TEX_COORD)
         GL30.glDisableVertexAttribArray(MeshShader.A_NORMALS)
     }
 }

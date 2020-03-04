@@ -20,6 +20,7 @@ abstract class GLEntity(val name: String) {
         GL.bindVertexArray(glEntityBufferUtils.vao) {
             renderInternal(glEntityBufferUtils)
         }
+        modelMatrix.identity()
     }
 
     protected abstract fun createInternal(glEntityBufferUtils: GLEntityBufferUtils)

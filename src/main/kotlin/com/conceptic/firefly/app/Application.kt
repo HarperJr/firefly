@@ -45,6 +45,8 @@ class Application(defScreenWidth: Int, defScreenHeight: Int, defTitle: String) :
     }
 
     override fun onShow() {
+        GL11.glEnable(GL11.GL_DEPTH_TEST)
+
         gameController.onShow()
         fixedUpdatesExecutor.submit(fixedUpdatesRunnable)
     }

@@ -48,6 +48,6 @@ class AsyncOperationsDisposable(private val asyncOperation: AsyncOperation<*>?) 
     }
 }
 
-fun <T> loadAsync(blockingFunc: () -> T): AsyncOperation<T> {
+fun <T> runAsync(blockingFunc: () -> T): AsyncOperation<T> {
     return AsyncOperation(blockingFunc)
 }
